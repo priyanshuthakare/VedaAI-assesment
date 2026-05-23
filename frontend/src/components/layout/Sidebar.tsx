@@ -1,0 +1,226 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const menuItems = [
+  { label: "Home", href: "/", icon: "home" },
+  { label: "My Groups", href: "/groups", icon: "groups" },
+  { label: "Assignments", href: "/assignments", icon: "assignments" },
+  { label: "AI Teacher's Toolkit", href: "/toolkit", icon: "book" },
+  { label: "My Library", href: "/library", icon: "library" },
+];
+
+function HomeIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <rect x="2" y="2" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="11" y="2" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="2" y="11" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.5" />
+      <rect x="11" y="11" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function GroupsIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path
+        d="M7 9C8.65685 9 10 7.65685 10 6C10 4.34315 8.65685 3 7 3C5.34315 3 4 4.34315 4 6C4 7.65685 5.34315 9 7 9Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M2 17C2 14.2386 4.23858 12 7 12C9.76142 12 12 14.2386 12 17"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M13 9C14.6569 9 16 7.65685 16 6C16 4.34315 14.6569 3 13 3"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M14 12C16.7614 12 19 14.2386 19 17"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function AssignmentsIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <rect x="3" y="2" width="11" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M7 7H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M7 10H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M7 13H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="12" y="4" width="5" height="5" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function BookIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path
+        d="M3 4.5C3 3.67157 3.67157 3 4.5 3H8C9.10457 3 10 3.89543 10 5V16.5C10 15.6716 9.32843 15 8.5 15H4.5C3.67157 15 3 15.6716 3 16.5V4.5Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M17 4.5C17 3.67157 16.3284 3 15.5 3H12C10.8954 3 10 3.89543 10 5V16.5C10 15.6716 10.6716 15 11.5 15H15.5C16.3284 15 17 15.6716 17 16.5V4.5Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function LibraryIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="10" cy="10" r="3" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function SettingsIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M10 2V4M10 16V18M18 10H16M4 10H2M15.66 4.34L14.24 5.76M5.76 14.24L4.34 15.66M15.66 15.66L14.24 14.24M5.76 5.76L4.34 4.34"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function CreateAssignmentIcon() {
+  return (
+    <svg width="18" height="17" viewBox="0 0 18 17" fill="none">
+      <path
+        d="M9 1V16M1 8.5H17"
+        stroke="white"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function getIcon(icon: string) {
+  switch (icon) {
+    case "home":
+      return <HomeIcon />;
+    case "groups":
+      return <GroupsIcon />;
+    case "assignments":
+      return <AssignmentsIcon />;
+    case "book":
+      return <BookIcon />;
+    case "library":
+      return <LibraryIcon />;
+    default:
+      return <HomeIcon />;
+  }
+}
+
+export function Sidebar() {
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    if (href === "/") return false;
+    if (href === "/assignments") return pathname === "/" || pathname.startsWith("/assignments");
+    return pathname === href;
+  };
+
+  return (
+    <aside className="dashboard-sidebar">
+      <div className="flex items-center gap-8">
+        <div className="dashboard-sidebar__logo-mark">
+          <Image src="/logo2.png" alt="VedaAI logo" width={40} height={40} priority />
+        </div>
+        <span className="font-bricolage font-bold text-[28px] leading-[20px] tracking-[-1.68px] text-primary-text">
+          VedaAI
+        </span>
+      </div>
+
+      {/* Create Assignment Button */}
+      <div className="mt-32">
+        <Link
+          href="/create"
+          className="dashboard-sidebar__create"
+          style={{
+            boxShadow:
+              "0px 32px 48px 0px rgba(255,255,255,0.02), 0px 16px 48px 0px rgba(255,255,255,0.01), inset 0px 0px 34.5px 0px rgba(255,255,255,0.06), inset 0px -1px 3.5px 0px rgba(176,176,176,0.36)",
+          }}
+        >
+          <CreateAssignmentIcon />
+          <span className="font-inter font-medium text-[16px] leading-[28px] tracking-[-0.64px] text-white">
+            Create Assignment
+          </span>
+        </Link>
+      </div>
+
+      <nav className="mt-56 flex flex-col gap-8">
+        {menuItems.map((item) => {
+          const active = isActive(item.href);
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`flex items-center gap-8 px-12 py-9 rounded-[8px] transition-colors ${
+                active
+                  ? "bg-surface-muted text-primary-text"
+                  : "text-secondary-text hover:bg-surface-secondary"
+              }`}
+            >
+              <span className={active ? "text-primary-text" : "text-secondary-text"}>
+                {getIcon(item.icon)}
+              </span>
+              <span
+                className={`font-bricolage text-[16px] leading-[22px] tracking-[-0.64px] ${
+                  active ? "font-semibold text-primary-text" : "font-normal text-secondary-text"
+                }`}
+              >
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="flex-1" />
+
+      <div className="flex flex-col gap-8">
+        <Link
+          href="/settings"
+          className="flex items-center gap-8 px-12 py-8 text-secondary-text hover:bg-surface-secondary rounded-[8px] transition-colors"
+        >
+          <SettingsIcon />
+          <span className="font-bricolage text-[16px] leading-[22px] tracking-[-0.64px]">
+            Settings
+          </span>
+        </Link>
+
+        <Image
+          className="dashboard-sidebar__school-card"
+          src="/avatar.png"
+          alt="Delhi Public School, Bokaro Steel City"
+          width={512}
+          height={168}
+        />
+      </div>
+    </aside>
+  );
+}

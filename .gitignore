@@ -1,0 +1,16 @@
+.claude
+.gstack
+node_modules
+dist
+coverage
+*.log
+*.env
+.DS_Store
+.vscode
+.idea
+*.iml
+*.sublime-project
+*.sublime-workspace
+*.swp
+
+    
