@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import puppeteer from "puppeteer";
-import { Result } from "../models/Result";
 import { Assignment } from "../models/Assignment";
+import { Result } from "../models/Result";
 import { QuestionPaper } from "../types";
 
 function escapeHtml(value: string): string {
@@ -13,46 +13,88 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function buildPdfHtml(paper: QuestionPaper, assignment: { input: { topic: string; dueDate: string } }): string {
-  const paperTitle = escapeHtml(paper.title || "Question Paper");
-  const subject = escapeHtml(paper.subject || "English");
-  const duration = escapeHtml(paper.duration || "45 minutes");
-  const dueDate = escapeHtml(assignment.input.dueDate || "");
+function difficultyLabel(d: string): string {
+  switch (d) {
+    case "easy": return "Easy";
+    case "hard": return "Challenging";
+    default:     return "Moderate";
+  }
+}
 
-  const sectionsHtml = paper.sections
-    .map(
-      (section) => `
-    <section class="section">
-      <h2>${escapeHtml(section.label || "")}</h2>
-      <p class="instruction">${escapeHtml(section.instruction || "")}</p>
-      <ol>
-      ${section.questions
-        .map(
-          (q) => `
+function buildPdfHtml(
+  paper: QuestionPaper,
+  assignment: { input: { topic: string; dueDate: string; schoolName?: string; className?: string } }
+): string {
+  const title      = escapeHtml(paper.title   || "Question Paper");
+  const subject    = escapeHtml(paper.subject || "General");
+  const duration   = escapeHtml(paper.duration || "45 minutes");
+  const dueDate    = escapeHtml(assignment.input.dueDate || "");
+  const schoolName = escapeHtml((assignment.input as any).schoolName || title);
+  const className  = escapeHtml((assignment.input as any).className  || "");
+
+  const total = paper.totalMarks || paper.sections.reduce(
+    (acc, s) => acc + s.questions.reduce((a, q) => a + q.marks, 0), 0
+  );
+
+  // Answer key collected while building questions
+  const answerKey: { num: number; answer?: string }[] = [];
+  let globalQNum = 0;
+
+  const sectionsHtml = paper.sections.map((section) => {
+    const questionsHtml = section.questions.map((q) => {
+      globalQNum++;
+      if (q.answer) answerKey.push({ num: globalQNum, answer: q.answer });
+
+      const optionsHtml = q.options
+        ? `<div class="options">
+            ${q.options.map((opt, i) =>
+              `<div class="option">
+                (${String.fromCharCode(97 + i)}) ${escapeHtml(opt)}
+              </div>`
+            ).join("")}
+           </div>`
+        : "";
+
+      return `
         <li class="question">
-          <div class="question-text">
-            [${q.difficulty === "hard" ? "Challenging" : q.difficulty === "easy" ? "Easy" : "Moderate"}]
-            ${escapeHtml(q.text)} [${q.marks} Marks]
-          </div>
-          ${
-            q.options
-              ? `<div class="options">${q.options
-                  .map(
-                    (opt, i) =>
-                      `<div class="option">${String.fromCharCode(97 + i)}) ${escapeHtml(opt)}</div>`
-                  )
-                  .join("")}</div>`
-              : ""
-          }
+          [${difficultyLabel(q.difficulty)}] ${escapeHtml(q.text)}
+          <span class="q-marks">[${q.marks} Mark${q.marks !== 1 ? "s" : ""}]</span>
+          ${optionsHtml}
         </li>
-      `
-        )
-        .join("")}
-      </ol>
-    </section>
-  `
-    )
-    .join("");
+      `;
+    }).join("");
+
+    // Determine section type label from first question type
+    const typeLabel = section.questions[0]?.type === "mcq"
+      ? "Multiple Choice Questions"
+      : section.questions[0]?.type === "long"
+      ? "Long Answer Questions"
+      : section.questions[0]?.type === "truefalse"
+      ? "True / False Questions"
+      : "Short Answer Questions";
+
+    return `
+      <div class="section">
+        <h2 class="section-title">${escapeHtml(section.label)}</h2>
+        <p class="section-type">${typeLabel}</p>
+        <p class="section-instruction"><em>${escapeHtml(section.instruction)}</em></p>
+        <ol class="questions-list">
+          ${questionsHtml}
+        </ol>
+      </div>
+    `;
+  }).join("");
+
+  const answerKeyHtml = answerKey.length > 0
+    ? `<div class="answer-key">
+        <h3 class="ak-title">Answer Key:</h3>
+        <ol class="ak-list">
+          ${answerKey.map(a =>
+            `<li class="ak-item">${escapeHtml(a.answer || "")}</li>`
+          ).join("")}
+        </ol>
+       </div>`
+    : "";
 
   return `
     <!DOCTYPE html>
@@ -62,162 +104,224 @@ function buildPdfHtml(paper: QuestionPaper, assignment: { input: { topic: string
       <style>
         @page {
           size: A4;
-          margin: 16mm 14mm 18mm 14mm;
+          margin: 20mm 18mm 22mm 18mm;
         }
 
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-          font-family: Inter, Arial, sans-serif;
-          color: #2f2f2f;
-          font-size: 12pt;
-          line-height: 1.45;
+          font-family: "Times New Roman", Times, serif;
+          font-size: 11.5pt;
+          color: #111;
+          line-height: 1.55;
           background: #fff;
         }
 
-        .shell {
-          width: 100%;
-        }
-
-        .paper {
-          border: 1px solid #d9d9d9;
-          border-radius: 8px;
-          padding: 18pt 18pt 20pt;
-          background: #fff;
-        }
-
-        .paper-header {
+        /* ── HEADER ── */
+        .header {
           text-align: center;
-          margin-bottom: 16pt;
-          border-bottom: 1px solid #d9d9d9;
+          margin-bottom: 14pt;
+          border-bottom: 2px solid #111;
           padding-bottom: 10pt;
         }
 
-        .paper-header__line {
-          font-size: 15.5pt;
-          line-height: 1.35;
+        .school-name {
+          font-size: 17pt;
           font-weight: 700;
-        }
-
-        .marks-row {
-          display: table;
-          width: 100%;
-          margin: 12pt 0 10pt;
-          font-size: 11pt;
-          font-weight: 600;
-        }
-
-        .marks-row span {
-          display: table-cell;
-          vertical-align: top;
-        }
-
-        .marks-row span:last-child {
-          text-align: right;
-        }
-
-        .instructions {
-          margin: 8pt 0 10pt;
-          font-size: 11pt;
-          font-weight: 600;
-        }
-
-        .student-lines {
-          margin: 8pt 0 14pt;
-          font-size: 11pt;
-          line-height: 1.65;
-          font-weight: 600;
-        }
-
-        .section {
-          margin-top: 14pt;
-          page-break-inside: avoid;
-          break-inside: avoid;
-        }
-
-        .section h2 {
-          text-align: center;
-          font-size: 13pt;
           line-height: 1.3;
-          font-weight: 700;
-          margin-bottom: 7pt;
-        }
-
-        .instruction {
-          font-size: 10.5pt;
-          line-height: 1.5;
-          margin-bottom: 8pt;
-          font-style: italic;
-          color: #4a4a4a;
-        }
-
-        .section ol {
-          margin-left: 12pt;
-          padding-left: 12pt;
-          font-size: 10.8pt;
-          line-height: 1.6;
-        }
-
-        .question {
-          margin-bottom: 9pt;
-          page-break-inside: avoid;
-          break-inside: avoid;
-        }
-
-        .question-text {
-          text-align: justify;
-        }
-
-        .options {
-          margin-top: 6pt;
-          margin-left: 4pt;
-          font-size: 10.2pt;
-          line-height: 1.5;
-        }
-
-        .option {
           margin-bottom: 3pt;
         }
 
-        .footer {
+        .header-sub {
+          font-size: 12pt;
+          font-weight: 700;
+          line-height: 1.5;
+        }
+
+        /* ── META ROW ── */
+        .meta-row {
+          display: flex;
+          justify-content: space-between;
+          font-size: 11pt;
+          font-weight: 700;
+          margin: 10pt 0 8pt;
+        }
+
+        /* ── GENERAL INSTRUCTION ── */
+        .general-instruction {
+          font-size: 11pt;
+          font-weight: 700;
+          margin-bottom: 12pt;
+        }
+
+        /* ── STUDENT INFO ── */
+        .student-info {
+          margin-bottom: 14pt;
+          font-size: 11pt;
+          font-weight: 400;
+          line-height: 2.0;
+        }
+
+        .student-info div {
+          display: flex;
+          align-items: baseline;
+          gap: 4pt;
+        }
+
+        .field-label {
+          font-weight: 400;
+          white-space: nowrap;
+        }
+
+        .field-line {
+          display: inline-block;
+          border-bottom: 1px solid #111;
+          min-width: 140pt;
+          height: 14pt;
+          vertical-align: bottom;
+        }
+
+        /* ── SECTION ── */
+        .section {
+          margin-top: 16pt;
+          page-break-inside: avoid;
+          break-inside: avoid;
+        }
+
+        .section-title {
+          text-align: center;
+          font-size: 13pt;
+          font-weight: 700;
+          margin-bottom: 4pt;
+        }
+
+        .section-type {
+          font-size: 11pt;
+          font-weight: 700;
+          margin-bottom: 2pt;
+        }
+
+        .section-instruction {
+          font-size: 10.5pt;
+          color: #333;
+          margin-bottom: 8pt;
+          font-style: italic;
+        }
+
+        /* ── QUESTIONS ── */
+        .questions-list {
+          padding-left: 20pt;
+          margin: 0;
+        }
+
+        .question {
+          font-size: 11pt;
+          line-height: 1.6;
+          margin-bottom: 7pt;
+          page-break-inside: avoid;
+          break-inside: avoid;
+          text-align: justify;
+        }
+
+        .q-marks {
+          font-weight: 400;
+          margin-left: 4pt;
+        }
+
+        /* ── MCQ OPTIONS ── */
+        .options {
+          margin-top: 4pt;
+          margin-left: 4pt;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2pt 20pt;
+          font-size: 10.8pt;
+        }
+
+        .option {
+          line-height: 1.5;
+        }
+
+        /* ── END LINE ── */
+        .end-line {
+          font-size: 11pt;
+          font-weight: 700;
           margin-top: 14pt;
-          padding-top: 8pt;
-          border-top: 1px solid #dadada;
-          font-size: 9pt;
-          color: #5d5d5d;
+        }
+
+        /* ── ANSWER KEY ── */
+        .answer-key {
+          margin-top: 24pt;
+          border-top: 2px solid #111;
+          padding-top: 12pt;
+          page-break-before: always;
+        }
+
+        .ak-title {
+          font-size: 13pt;
+          font-weight: 700;
+          margin-bottom: 8pt;
+        }
+
+        .ak-list {
+          padding-left: 18pt;
+        }
+
+        .ak-item {
+          font-size: 11pt;
+          line-height: 1.65;
+          margin-bottom: 6pt;
+          text-align: justify;
+          page-break-inside: avoid;
+          break-inside: avoid;
         }
       </style>
     </head>
     <body>
-      <div class="shell">
-        <div class="paper">
-          <div class="paper-header">
-            <div class="paper-header__line">${paperTitle}</div>
-            <div class="paper-header__line">Subject: ${subject}</div>
-            <div class="paper-header__line">Class: 5th</div>
-          </div>
 
-          <div class="marks-row">
-            <span>Time Allowed: ${duration}</span>
-            <span>Maximum Marks: ${paper.totalMarks || 20}</span>
-          </div>
+      <!-- HEADER -->
+      <div class="header">
+        <div class="school-name">${schoolName}</div>
+        <div class="header-sub">Subject: ${subject}</div>
+        ${className ? `<div class="header-sub">Class: ${className}</div>` : ""}
+      </div>
 
-          <p class="instructions">All questions are compulsory unless stated otherwise.</p>
-          <div class="student-lines">
-            <div>Name: ____________________</div>
-            <div>Roll Number: ________________</div>
-            <div>Class: 5th Section: _________</div>
-          </div>
+      <!-- META ROW -->
+      <div class="meta-row">
+        <span>Time Allowed: ${duration}</span>
+        <span>Maximum Marks: ${total}</span>
+      </div>
 
-          ${sectionsHtml}
+      <!-- GENERAL INSTRUCTION -->
+      <p class="general-instruction">
+        All questions are compulsory unless stated otherwise.
+      </p>
 
-          <p class="footer">${dueDate ? `Due Date: ${dueDate}` : ""}</p>
+      <!-- STUDENT INFO -->
+      <div class="student-info">
+        <div>
+          <span class="field-label">Name:</span>
+          <span class="field-line"></span>
+        </div>
+        <div>
+          <span class="field-label">Roll Number:</span>
+          <span class="field-line"></span>
+        </div>
+        <div>
+          <span class="field-label">${className ? `Class: ${className} Section:` : "Section:"}</span>
+          <span class="field-line" style="min-width:80pt;"></span>
         </div>
       </div>
+
+      <!-- SECTIONS -->
+      ${sectionsHtml}
+
+      <!-- END LINE -->
+      <p class="end-line">End of Question Paper</p>
+
+      <!-- ANSWER KEY -->
+      ${answerKeyHtml}
+
     </body>
     </html>
   `;
@@ -249,24 +353,29 @@ export async function generatePdf(req: Request, res: Response): Promise<void> {
 
     const pdfBuffer = await page.pdf({
       format: "A4",
-      margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" },
-      printBackground: true,
+      margin: { top: "20mm", bottom: "22mm", left: "18mm", right: "18mm" },
+      printBackground: false,
+      displayHeaderFooter: true,
+      headerTemplate: `<div></div>`,
+      footerTemplate: `
+        <div style="width:100%;font-size:8pt;color:#555;
+                    display:flex;justify-content:flex-end;
+                    padding:0 18mm;font-family:Times New Roman,serif;">
+          <span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>
+        </div>`,
     });
 
-    const safeName = (result.questionPaper.title || "question-paper").replace(/[^\w\-]+/g, "_");
-    const versionedName = `${safeName}-${Date.now()}.pdf`;
+    const safeName = (result.questionPaper.title || "question-paper")
+      .replace(/[^\w\-]+/g, "_");
+
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${versionedName}"`);
-    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-    res.setHeader("Pragma", "no-cache");
-    res.setHeader("Expires", "0");
+    res.setHeader("Content-Disposition", `attachment; filename="${safeName}-${Date.now()}.pdf"`);
+    res.setHeader("Cache-Control", "no-store");
     res.send(Buffer.from(pdfBuffer));
-  } catch (error) {
-    console.error("[generatePdf] Error:", error);
+  } catch (err) {
+    console.error("[generatePdf] Error:", err);
     res.status(500).json({ error: "Failed to generate PDF" });
   } finally {
-    if (browser) {
-      await browser.close();
-    }
+    if (browser) await browser.close();
   }
 }
