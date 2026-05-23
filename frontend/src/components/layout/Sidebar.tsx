@@ -107,11 +107,18 @@ function SettingsIcon() {
 
 function CreateAssignmentIcon() {
   return (
-    <svg width="18" height="17" viewBox="0 0 18 17" fill="none">
+    <svg width="18" height="17" viewBox="0 0 18 17" fill="none" aria-hidden="true">
       <path
-        d="M9 1V16M1 8.5H17"
+        d="M9 0.8L10.6 6.1L16 8.5L10.6 10.9L9 16.2L7.4 10.9L2 8.5L7.4 6.1L9 0.8Z"
         stroke="white"
-        strokeWidth="2"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        fill="white"
+      />
+      <path
+        d="M14.4 1.8L14.9 3.4L16.5 3.9L14.9 4.4L14.4 6L13.9 4.4L12.3 3.9L13.9 3.4L14.4 1.8Z"
+        fill="white"
         strokeLinecap="round"
       />
     </svg>
@@ -148,29 +155,27 @@ export function Sidebar() {
     <aside className="dashboard-sidebar">
       <div className="flex items-center gap-8">
         <div className="dashboard-sidebar__logo-mark">
-          <Image src="/logo2.png" alt="VedaAI logo" width={40} height={40} priority />
+          <Image src="/logo2.png" alt="VedaAI logo" width={50} height={50} priority />
         </div>
         <span className="font-bricolage font-bold text-[28px] leading-[20px] tracking-[-1.68px] text-primary-text">
           VedaAI
         </span>
       </div>
 
-      {/* Create Assignment Button */}
-      <div className="mt-32">
-        <Link
-          href="/create"
-          className="dashboard-sidebar__create"
-          style={{
-            boxShadow:
-              "0px 32px 48px 0px rgba(255,255,255,0.02), 0px 16px 48px 0px rgba(255,255,255,0.01), inset 0px 0px 34.5px 0px rgba(255,255,255,0.06), inset 0px -1px 3.5px 0px rgba(176,176,176,0.36)",
-          }}
-        >
-          <CreateAssignmentIcon />
-          <span className="font-inter font-medium text-[16px] leading-[28px] tracking-[-0.64px] text-white">
-            Create Assignment
-          </span>
-        </Link>
-      </div>
+    {/* Create Assignment Button */}
+<div className="mt-32">
+  <Link
+    href="/create"
+    className="inline-flex items-center justify-center gap-2 px-14 py-3 bg-[#1a1a1a] border-2 border-[#ff6b35] rounded-full font-inter font-medium text-[16px] leading-[28px] tracking-[-0.64px] text-white whitespace-nowrap transition-all duration-300 hover:bg-[#242424] hover:border-[#ff8855] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+    style={{
+      boxShadow:
+        "0px 8px 24px rgba(255,107,53,0.12), inset 0px 1px 2px rgba(255,255,255,0.08), inset 0px 0px 12px rgba(255,107,53,0.08), 0px 4px 12px rgba(0,0,0,0.3)",
+    }}
+  >
+    <CreateAssignmentIcon />
+    <span>Create Assignment</span>
+  </Link>
+</div>
 
       <nav className="mt-56 flex flex-col gap-8">
         {menuItems.map((item) => {

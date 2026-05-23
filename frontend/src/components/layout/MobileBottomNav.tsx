@@ -68,6 +68,7 @@ export function MobileBottomNav() {
 
   return (
     <>
+      <div className="mobile-nav-blur" aria-hidden="true" />
       <Link href="/create" className="mobile-create-button" aria-label="Create assignment">
         <CreateIcon />
       </Link>
