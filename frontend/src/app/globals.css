@@ -446,6 +446,131 @@ body {
   letter-spacing: -0.64px;
 }
 
+.output-screen {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.output-ai-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 32px;
+  border-radius: 32px;
+  background: #2f2f2f;
+  color: #efefef;
+}
+
+.output-ai-card__message {
+  font-family: var(--font-bricolage), sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+  letter-spacing: -0.8px;
+}
+
+.output-ai-card__download {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  height: 44px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 100px;
+  background: #f6f6f6;
+  color: #2f2f2f;
+  font-family: var(--font-bricolage), sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.56px;
+}
+
+.output-paper {
+  padding: 48px 40px;
+  border-radius: 32px;
+  background: #ffffff;
+  color: #2f2f2f;
+  font-family: var(--font-inter), sans-serif;
+}
+
+.output-paper__school {
+  text-align: center;
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.96px;
+}
+
+.output-paper__meta {
+  text-align: center;
+  font-size: 44px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.96px;
+}
+
+.output-paper__marks-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 36px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 28.8px;
+  letter-spacing: -0.72px;
+}
+
+.output-paper__instructions {
+  margin-top: 28px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 28.8px;
+  letter-spacing: -0.72px;
+}
+
+.output-paper__student-lines {
+  margin-top: 28px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 36px;
+  letter-spacing: -0.72px;
+}
+
+.output-paper__section {
+  margin-top: 32px;
+}
+
+.output-paper__section h2 {
+  text-align: center;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 42px;
+  letter-spacing: -0.64px;
+}
+
+.output-paper__section-note {
+  margin-top: 16px;
+  font-size: 18px;
+  line-height: 28px;
+}
+
+.output-paper__section ol {
+  margin-top: 18px;
+  padding-left: 28px;
+  font-size: 20px;
+  line-height: 1.7;
+  letter-spacing: -0.64px;
+}
+
+.output-paper__section li {
+  margin-bottom: 8px;
+}
+
 @media (max-width: 767px) {
   .dashboard-layout {
     position: relative;
@@ -644,5 +769,99 @@ body {
     height: 5px;
     border-radius: var(--radius-100);
     background: var(--color-2f2f2f7f);
+  }
+
+  .output-screen {
+    width: 373px;
+    margin: 190px auto 24px;
+    gap: 10px;
+  }
+
+  .output-ai-card {
+    border-radius: 32px;
+    padding: 24px 16px;
+  }
+
+  .output-ai-card__message {
+    font-size: 14px;
+    line-height: 16.8px;
+    letter-spacing: -0.56px;
+    color: #efefef;
+  }
+
+  .output-ai-card__download {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 100px;
+    background: #f6f6f619;
+  }
+
+  .output-ai-card__download span {
+    display: none;
+  }
+
+  .output-ai-card__download svg path {
+    stroke: #ffffff;
+  }
+
+  .output-paper {
+    border-radius: 32px;
+    padding: 24px 16px;
+    background: #f6f6f6;
+  }
+
+  .output-paper__school {
+    text-align: left;
+    font-size: 16px;
+    line-height: 20.8px;
+    letter-spacing: -0.32px;
+  }
+
+  .output-paper__meta {
+    text-align: left;
+    font-size: 16px;
+    line-height: 20.8px;
+    letter-spacing: -0.32px;
+  }
+
+  .output-paper__marks-row {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 22.4px;
+    letter-spacing: -0.56px;
+  }
+
+  .output-paper__instructions,
+  .output-paper__student-lines {
+    margin-top: 14px;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: -0.64px;
+    font-weight: 400;
+  }
+
+  .output-paper__section h2 {
+    text-align: left;
+    font-size: 16px;
+    line-height: 25.6px;
+    letter-spacing: -0.64px;
+  }
+
+  .output-paper__section-note {
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: -0.64px;
+  }
+
+  .output-paper__section ol {
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: -0.64px;
+    padding-left: 22px;
   }
 }

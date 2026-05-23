@@ -7,9 +7,14 @@ import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 interface DashboardLayoutProps {
   children: React.ReactNode;
   breadcrumb?: string;
+  hideMobileNav?: boolean;
 }
 
-export function DashboardLayout({ children, breadcrumb }: DashboardLayoutProps) {
+export function DashboardLayout({
+  children,
+  breadcrumb,
+  hideMobileNav = false,
+}: DashboardLayoutProps) {
   return (
     <div className="dashboard-layout">
       <div className="dashboard-layout__sidebar">
@@ -21,9 +26,11 @@ export function DashboardLayout({ children, breadcrumb }: DashboardLayoutProps) 
         <main className="dashboard-layout__content">{children}</main>
       </div>
 
-      <div className="dashboard-layout__mobile-nav">
-        <MobileBottomNav />
-      </div>
+      {!hideMobileNav && (
+        <div className="dashboard-layout__mobile-nav">
+          <MobileBottomNav />
+        </div>
+      )}
     </div>
   );
 }

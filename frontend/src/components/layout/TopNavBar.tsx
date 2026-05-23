@@ -28,6 +28,14 @@ function BreadcrumbIcon() {
   );
 }
 
+function SparkleIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 2L11.9 8.1L18 10L11.9 11.9L10 18L8.1 11.9L2 10L8.1 8.1L10 2Z" fill="#A9A9A9" />
+    </svg>
+  );
+}
+
 function NotificationIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -66,6 +74,8 @@ interface TopNavBarProps {
 }
 
 export function TopNavBar({ breadcrumb = "Assignment" }: TopNavBarProps) {
+  const isCreateNew = breadcrumb.toLowerCase() === "create new";
+
   return (
     <>
       <header className="dashboard-topnav">
@@ -73,7 +83,7 @@ export function TopNavBar({ breadcrumb = "Assignment" }: TopNavBarProps) {
           <ArrowLeftIcon />
         </Link>
         <div className="dashboard-topnav__breadcrumb">
-          <BreadcrumbIcon />
+          {isCreateNew ? <SparkleIcon /> : <BreadcrumbIcon />}
           <span>{breadcrumb}</span>
         </div>
         <div className="dashboard-topnav__actions">
@@ -89,17 +99,7 @@ export function TopNavBar({ breadcrumb = "Assignment" }: TopNavBarProps) {
         </div>
       </header>
 
-      <div className="mobile-browser-bar" aria-hidden="true">
-        <div className="mobile-browser-bar__status">
-          <span>9:41</span>
-          <span>Signal WiFi Battery</span>
-        </div>
-        <div className="mobile-browser-bar__address">
-          <span>O</span>
-          <span>web-to-figma.design</span>
-          <span>^</span>
-        </div>
-      </div>
+
       <header className="mobile-app-header">
         <div className="mobile-app-header__brand">
           <div className="mobile-app-header__logo">
