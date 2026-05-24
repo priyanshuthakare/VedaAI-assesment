@@ -345,7 +345,6 @@ export async function generatePdf(req: Request, res: Response): Promise<void> {
 
     browser = await puppeteer.launch({
       headless: true,
-      executablePath: await puppeteer.executablePath(),
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
