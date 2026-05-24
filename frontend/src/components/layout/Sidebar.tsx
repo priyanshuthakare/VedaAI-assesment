@@ -160,7 +160,7 @@ export function Sidebar() {
     <aside className="dashboard-sidebar">
       <div className="flex items-center gap-8">
         <div className="dashboard-sidebar__logo-mark">
-          <Image src="/logo11.avif" alt="VedaAI logo" width={50} height={50} priority />
+          <Image src="/logo11.png" alt="VedaAI logo" width={50} height={50} priority />
         </div>
         <span className="font-bricolage font-bold text-[28px] leading-[20px] tracking-[-1.68px] text-primary-text">
           VedaAI
