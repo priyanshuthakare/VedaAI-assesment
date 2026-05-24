@@ -1,36 +1,146 @@
 # Frontend Component Library
 
-The frontend is built using Next.js, React, and Tailwind CSS. It follows an atomic design pattern to ensure reusability and strict adherence to the Figma specifications.
+All UI components live under `frontend/src/components/`. They are split into two categories: atomic **UI** components, and **Layout** components that compose the page structure.
 
-## Core UI Components (`/src/components/ui`)
+---
+
+## UI Components (`src/components/ui/`)
 
 ### `Button`
-A reusable button component with various states (default, hover, loading, disabled). It utilizes a spinner animation during loading states and accepts standard button HTML attributes.
+The primary action component. Supports loading, disabled, and hover states.
 
-### `Input` & `Select`
-Styled form controls with consistent padding, borders, and focus rings that match the Figma inputs. They are fully responsive and accessible.
+**Props:**
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `onClick` | `() => void` | — | Click handler |
+| `isLoading` | `boolean` | `false` | Replaces content with a spinner |
+| `disabled` | `boolean` | `false` | Prevents interaction |
+| `className` | `string` | — | Additional Tailwind overrides |
+| `children` | `ReactNode` | — | Button label / content |
 
-### `FileUpload`
-A drag-and-drop file upload zone used on the creation page. It handles file selection, size validation, and visual feedback for the user.
+---
+
+### `Input`
+A styled text input with consistent focus ring, padding, and placeholder styling to match the Figma design.
+
+**Props:** Extends all standard `HTMLInputElement` attributes (`value`, `onChange`, `placeholder`, `type`, etc.)
+
+---
+
+### `Select`
+A styled dropdown selector. Used in the question type rows on the creation form.
+
+**Props:**
+| Prop | Type | Description |
+|---|---|---|
+| `value` | `string` | Currently selected value |
+| `onChange` | `ChangeEventHandler` | Change callback |
+| `options` | `{ value: string; label: string }[]` | Dropdown options |
+| `className` | `string` | Tailwind overrides |
+
+---
 
 ### `DatePicker`
-A styled wrapper around the native HTML date input, ensuring cross-browser consistency in appearance.
+A styled wrapper around the native `<input type="date">`. Ensures cross-browser consistency.
 
-## Layout Components (`/src/components/layout`)
+**Props:** `value`, `onChange`, `placeholder` — same interface as `Input`.
 
-### `Sidebar`
-The main navigation menu. It handles active route highlighting, mobile collapsing, and includes the "Coming Soon" placeholders for unimplemented views.
+---
+
+### `FileUpload`
+A drag-and-drop file upload zone. Used on the assignment creation form for uploading reference documents.
+
+**Props:**
+| Prop | Type | Description |
+|---|---|---|
+| `onFileSelect` | `(file: File) => void` | Called when the user selects a file |
+| `accept` | `string` | Accepted MIME types, e.g. `"image/jpeg,application/pdf"` |
+| `maxSizeMB` | `number` | Maximum file size in megabytes |
+
+---
+
+### `Badge`
+A small colored tag used on the Output page to visually indicate question difficulty.
+
+**Color mapping:**
+- `easy` → Green (`#4BC16C`)
+- `medium` → Orange (`#F59E0B`)
+- `hard` → Red (`#E23D3D`)
+
+---
+
+### `Spinner`
+A rotating loading indicator used inside `Button` and on the status page.
+
+---
+
+### `ProgressBar`
+A horizontal progress bar used on the `/status/[id]` page. Width is driven by the `progress` value (0–100) from the Zustand `generationStore`.
+
+---
+
+### `Card`
+A generic white container with a rounded `24px` border-radius and subtle box shadow. Used as a wrapper on the output page sections.
+
+---
+
+### `Toast`
+A transient notification component for success/error feedback.
+
+---
+
+## Layout Components (`src/components/layout/`)
 
 ### `DashboardLayout`
-The master layout wrapper that combines the Sidebar and the main content area. It provides consistent padding, the top-right user profile header, and breadcrumb navigation.
+The root layout wrapper used by every page inside the authenticated section. It renders:
+- The `Sidebar` on desktop
+- The `MobileBottomNav` on mobile
+- The `TopNavBar` with breadcrumb, notifications, and user avatar
+- The main scrollable content area
+
+**Props:**
+| Prop | Type | Description |
+|---|---|---|
+| `breadcrumb` | `string` | Text shown in the top nav (e.g., `"Assignment"`) |
+| `children` | `ReactNode` | Page content |
+
+---
+
+### `Sidebar`
+The left navigation panel, visible on desktop only (`md:` breakpoint and above). It contains:
+- The VedaAI logo
+- The **"+ Create Assignment"** pill button
+- Navigation links: Home, My Groups, Assignments, AI Teacher's Toolkit, My Library
+- Settings link at the bottom
+- School/institution info card
+
+**Active State Logic:**
+- `Home` is only highlighted when the pathname is exactly `/`.
+- `Assignments` is highlighted when the pathname starts with `/assignments`, `/create`, `/status`, or `/output`.
+- All other links show "Coming Soon" states.
+
+---
+
+### `TopNavBar`
+The horizontal bar at the top of the content area. It contains the breadcrumb, notification bell, and user avatar with dropdown.
+
+---
+
+### `MobileBottomNav`
+A fixed bottom navigation bar visible only on mobile devices. Provides quick access to the core navigation routes.
+
+---
 
 ### `CreateAssignmentDock`
-A floating, pill-shaped action dock pinned to the bottom-center of the screen, providing quick access to the "Create Assignment" route from anywhere in the app.
+A floating pill-shaped button pinned to the bottom center of the page on the assignments list view. It provides persistent access to the creation flow without cluttering the UI.
 
-## Feature Components
+> **Note:** This component is conditionally hidden when the assignment list is empty to avoid duplicating the CTA with the empty state's "Create Your First Assignment" button.
 
-### `AssignmentCard`
-Used on the Dashboard to display existing assignments. It includes a dropdown menu for "View" and "Delete" actions and formats dates dynamically.
+---
 
-### `QuestionCard`
-Used on the Output page to render a single AI-generated question. It handles the display of the question text, allocated marks, and the colored visual Difficulty Badges (Easy, Moderate, Hard).
+### `EmptyStateIllustration`
+The centered illustration + text + CTA button displayed when the database has no assignments. It renders:
+- The `noassignment.png` illustration
+- A "No assignments yet" heading
+- A descriptive paragraph
+- A `Link` to `/create` styled as a black pill button
