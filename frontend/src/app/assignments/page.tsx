@@ -3,9 +3,18 @@
 import { CreateAssignmentDock, DashboardLayout } from "@/components/layout";
 import { api } from "@/lib/api";
 import type { Assignment } from "@/types";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
+
+function PlusIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path d="M10 2.5V17.5M2.5 10H17.5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 function SearchIcon() {
   return (
@@ -123,59 +132,103 @@ export default function AssignmentsPage() {
           </div>
         </div>
 
-        {/* Header */}
-        <div className="flex items-center gap-12 px-8 max-md:hidden">
-          <div className="relative">
-            <div className="w-[12px] h-[12px] rounded-full bg-accent-green" />
-            <div className="absolute inset-[-4px] rounded-full border-[4px] border-[#4BC16C66]" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <h1 className="font-bricolage font-bold text-[20px] leading-[28px] tracking-[-0.8px] text-primary-text">
-              Assignments
-            </h1>
-            <p className="font-bricolage font-normal text-[14px] leading-[20px] tracking-[-0.56px] text-[#5D5D5D8C]">
-              Manage and create assignments for your classes.
-            </p>
-          </div>
-        </div>
-
-        {/* Toolbar */}
-        <div className="flex h-[64px] items-center gap-36 rounded-[20px] bg-white px-16 max-md:w-[373px] max-md:justify-between max-md:gap-0 max-md:rounded-[16px] max-md:px-[16px]">
-          {/* Filter */}
-          <div className="flex items-center gap-[4px]">
-            <FilterIcon />
-            <span className="font-bricolage text-[14px] font-normal leading-[19.6px] tracking-[-0.56px] text-[#A9A9A9]">
-              Filter
-            </span>
-          </div>
-
-          {/* Search */}
-          <div className="w-[340px] max-md:w-[228px] ml-auto">
-            <div className="flex h-[44px] w-full items-center gap-[12px] rounded-[100px] border border-[rgba(0,0,0,0.2)] px-[16px] py-[11px]">
-              <SearchIcon />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Name"
-                className="flex-1 bg-transparent font-bricolage text-[14px] font-normal leading-[19.6px] tracking-[-0.56px] text-primary-text placeholder:text-[#A9A9A9] outline-none"
-              />
+        {/* Conditionally hide Header and Toolbar if database is completely empty */}
+        {(loading || assignments.length > 0) && (
+          <>
+            {/* Header */}
+            <div className="flex items-center gap-12 px-8 max-md:hidden">
+              <div className="relative">
+                <div className="w-[12px] h-[12px] rounded-full bg-accent-green" />
+                <div className="absolute inset-[-4px] rounded-full border-[4px] border-[#4BC16C66]" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <h1 className="font-bricolage font-bold text-[20px] leading-[28px] tracking-[-0.8px] text-primary-text">
+                  Assignments
+                </h1>
+                <p className="font-bricolage font-normal text-[14px] leading-[20px] tracking-[-0.56px] text-[#5D5D5D8C]">
+                  Manage and create assignments for your classes.
+                </p>
+              </div>
             </div>
+
+            {/* Toolbar */}
+            <div className="flex h-[64px] items-center gap-36 rounded-[20px] bg-white px-16 max-md:w-[373px] max-md:justify-between max-md:gap-0 max-md:rounded-[16px] max-md:px-[16px]">
+              {/* Filter */}
+              <div className="flex items-center gap-[4px]">
+                <FilterIcon />
+                <span className="font-bricolage text-[14px] font-normal leading-[19.6px] tracking-[-0.56px] text-[#A9A9A9]">
+                  Filter
+                </span>
+              </div>
+
+              {/* Search */}
+              <div className="w-[340px] max-md:w-[228px] ml-auto">
+                <div className="flex h-[44px] w-full items-center gap-[12px] rounded-[100px] border border-[rgba(0,0,0,0.2)] px-[16px] py-[11px]">
+                  <SearchIcon />
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Search Name"
+                    className="flex-1 bg-transparent font-bricolage text-[14px] font-normal leading-[19.6px] tracking-[-0.56px] text-primary-text placeholder:text-[#A9A9A9] outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Content area */}
+        {loading ? (
+          <div className="flex justify-center items-center py-24">
+            <span className="font-bricolage text-[16px] text-[#A9A9A9]">Loading assignments...</span>
           </div>
-        </div>
+        ) : assignments.length === 0 ? (
+          <section className="flex flex-col items-center justify-center flex-1 min-h-[60vh]">
+            <div className="flex flex-col items-center max-w-[520px] text-center gap-6">
+              <Image
+                src="/noassignment.png"
+                alt="No assignments yet"
+                width={340}
+                height={340}
+                priority
+                className="mb-2"
+              />
+              <div className="flex flex-col gap-3">
+                <h2 className="font-bricolage font-bold text-[22px] leading-[28px] tracking-[-0.88px] text-[#2F2F2F]">
+                  No assignments yet
+                </h2>
+                <p className="font-bricolage font-normal text-[15px] leading-[22px] tracking-[-0.6px] text-[#A9A9A9] max-w-[460px] mx-auto">
+                  Create your first assignment to start collecting and grading
+                  student submissions. You can set up rubrics, define marking
+                  criteria, and let AI assist with grading.
+                </p>
+              </div>
+              <Link
+                href="/create"
+                className="mt-2 flex items-center justify-center gap-2 px-8 py-3.5 bg-[#111111] hover:bg-[#2F2F2F] transition-colors rounded-[100px]"
+              >
+                <PlusIcon />
+                <span className="font-inter font-medium text-[15px] text-white">
+                  Create Your First Assignment
+                </span>
+              </Link>
+            </div>
+          </section>
+        ) : filtered.length > 0 ? (
+          <div className="grid grid-cols-2 gap-16 max-md:grid-cols-1">
+            {filtered.map((assignment) => (
+              <AssignmentCard key={assignment._id} assignment={assignment} onDelete={handleDelete} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex justify-center items-center py-24">
+            <span className="font-bricolage text-[16px] text-[#A9A9A9]">No assignments match your search.</span>
+          </div>
+        )}
 
-        {/* Assignment Cards */}
-        <div className="grid grid-cols-2 gap-16 max-md:grid-cols-1">
-          {!loading && filtered.length > 0
-            ? filtered.map((assignment) => (
-                <AssignmentCard key={assignment._id} assignment={assignment} onDelete={handleDelete} />
-              ))
-            : placeholderCards.map((card) => (
-                <PlaceholderCard key={card._id} title={card.title} assignedOn={card.assignedOn} dueOn={card.dueOn} />
-              ))}
-        </div>
-
-        <CreateAssignmentDock />
+        {/* Conditionally hide the floating dock button in empty state */}
+        {(!loading && assignments.length > 0) && <CreateAssignmentDock />}
       </div>
     </DashboardLayout>
   );
