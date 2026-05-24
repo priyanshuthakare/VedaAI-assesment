@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { DashboardLayout } from "@/components/layout";
-import { Button, FileUpload, DatePicker, Select, Input } from "@/components/ui";
+import { Button, DatePicker, FileUpload, Input, Select } from "@/components/ui";
+import { api } from "@/lib/api";
 import { useAssignmentStore } from "@/store/assignmentStore";
 import { useGenerationStore } from "@/store/generationStore";
-import { api } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 
 const questionTypeOptions = [
   { value: "mcq", label: "Multiple Choice Questions" },
@@ -187,85 +187,188 @@ export default function CreateAssignmentPage() {
             </div>
 
             {/* Question Types */}
-            <div className="flex flex-col gap-16">
-              <div className="flex gap-64 max-md:flex-col max-md:gap-16">
-                {/* Left - Question Type Selectors */}
-                <div className="flex-1 flex flex-col gap-16">
-                  <label className="font-bricolage font-bold text-[16px] leading-[22px] tracking-[-0.64px] text-primary-text">
+            <div className="flex flex-col gap-12">
+              {/* ── Desktop header row ── hidden on mobile */}
+              <div className="hidden md:flex items-center gap-0">
+                <div className="flex-1">
+                  <span className="font-bricolage font-bold text-[16px] leading-[22px] tracking-[-0.64px] text-primary-text">
                     Question Type
-                  </label>
+                  </span>
+                </div>
+                <div className="flex gap-8 mr-8">
+                  <span className="w-[120px] text-center font-bricolage font-normal text-[14px] leading-[20px] tracking-[-0.56px] text-secondary-text">
+                    No. of Questions
+                  </span>
+                  <span className="w-[80px] text-center font-bricolage font-normal text-[14px] leading-[20px] tracking-[-0.56px] text-secondary-text">
+                    Marks
+                  </span>
+                </div>
+              </div>
 
-                  {questionTypes.map((qt) => (
-                    <div key={qt.id} className="flex items-center gap-12">
+              {/* ── Desktop rows ── */}
+              <div className="hidden md:flex flex-col gap-12">
+                {questionTypes.map((qt) => (
+                  <div key={qt.id} className="flex items-center gap-12">
+                    {/* Dropdown */}
+                    <div className="flex-1">
+                      <Select
+                        value={qt.type}
+                        onChange={(e) => updateQuestionType(qt.id, "type", e.target.value)}
+                        options={questionTypeOptions}
+                      />
+                    </div>
+                    {/* Remove */}
+                    <button
+                      onClick={() => removeQuestionType(qt.id)}
+                      className="flex items-center justify-center w-[20px] h-[20px] text-muted hover:text-primary-text transition-colors flex-shrink-0"
+                    >
+                      <XIcon />
+                    </button>
+                    {/* Steppers */}
+                    <div className="flex gap-8">
+                      {/* Count stepper */}
+                      <div className="flex items-center w-[120px] h-[44px] rounded-full bg-surface-secondary border border-border-input overflow-hidden">
+                        <button
+                          onClick={() => updateQuestionType(qt.id, "count", Math.max(1, qt.count - 1))}
+                          className="flex-1 h-full flex items-center justify-center font-bricolage font-normal text-[18px] text-primary-text hover:bg-border-input/20 transition-colors"
+                        >
+                          −
+                        </button>
+                        <span className="w-[32px] text-center font-bricolage font-semibold text-[14px] text-primary-text select-none">
+                          {qt.count}
+                        </span>
+                        <button
+                          onClick={() => updateQuestionType(qt.id, "count", Math.min(50, qt.count + 1))}
+                          className="flex-1 h-full flex items-center justify-center font-bricolage font-normal text-[18px] text-primary-text hover:bg-border-input/20 transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
+                      {/* Marks stepper */}
+                      <div className="flex items-center w-[80px] h-[44px] rounded-full bg-surface-secondary border border-border-input overflow-hidden">
+                        <button
+                          onClick={() => updateQuestionType(qt.id, "marks", Math.max(1, qt.marks - 1))}
+                          className="flex-1 h-full flex items-center justify-center font-bricolage font-normal text-[18px] text-primary-text hover:bg-border-input/20 transition-colors"
+                        >
+                          −
+                        </button>
+                        <span className="w-[24px] text-center font-bricolage font-semibold text-[14px] text-primary-text select-none">
+                          {qt.marks}
+                        </span>
+                        <button
+                          onClick={() => updateQuestionType(qt.id, "marks", Math.min(20, qt.marks + 1))}
+                          className="flex-1 h-full flex items-center justify-center font-bricolage font-normal text-[18px] text-primary-text hover:bg-border-input/20 transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ── Mobile cards ── */}
+              <div className="flex md:hidden flex-col gap-8">
+                {questionTypes.map((qt) => (
+                  <div
+                    key={qt.id}
+                    className="flex flex-col gap-10 rounded-[32px] bg-white p-20"
+                    style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05)" }}
+                  >
+                    {/* Card header: select + X */}
+                    <div className="flex items-center gap-10">
                       <div className="flex-1">
                         <Select
                           value={qt.type}
                           onChange={(e) => updateQuestionType(qt.id, "type", e.target.value)}
                           options={questionTypeOptions}
+                          className="border-0 bg-transparent focus:border-0 px-0 text-[15px] font-semibold"
                         />
                       </div>
                       <button
                         onClick={() => removeQuestionType(qt.id)}
-                        className="w-[16px] h-[16px] flex items-center justify-center text-muted hover:text-primary-text transition-colors"
+                        className="flex items-center justify-center w-[18px] h-[18px] text-muted hover:text-primary-text transition-colors flex-shrink-0"
                       >
                         <XIcon />
                       </button>
                     </div>
-                  ))}
 
-                  <button
-                    onClick={addQuestionType}
-                    className="flex items-center gap-6 font-bricolage font-bold text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text hover:opacity-70 transition-opacity"
-                  >
-                    <PlusIcon />
-                    <span>Add Question Type</span>
-                  </button>
-                </div>
-
-                {/* Right - Marks */}
-                <div className="w-[211px] flex flex-col gap-16">
-                  <label className="font-bricolage font-bold text-[16px] leading-[22px] tracking-[-0.64px] text-primary-text">
-                    Marks
-                  </label>
-
-                  {questionTypes.map((qt) => (
-                    <div key={qt.id} className="flex items-center gap-12">
-                      <div className="flex items-center gap-8">
-                        <span className="font-bricolage font-normal text-[14px] text-primary-text">
-                          Qty:
+                    {/* Card body: gray inset with labels + steppers */}
+                    <div className="flex gap-10 rounded-[20px] bg-[#EBEBEB] p-16">
+                      {/* No. of Questions column */}
+                      <div className="flex-1 flex flex-col gap-10 items-center">
+                        <span className="font-bricolage font-medium text-[14px] leading-[18px] tracking-[-0.52px] text-[#5D5D5D]">
+                          No. of Questions
                         </span>
-                        <input
-                          type="number"
-                          min={1}
-                          max={50}
-                          value={qt.count}
-                          onChange={(e) =>
-                            updateQuestionType(qt.id, "count", parseInt(e.target.value) || 1)
-                          }
-                          className="w-[48px] h-[36px] rounded-[8px] border border-border-input px-8 text-center font-bricolage text-[14px] text-primary-text bg-white focus:outline-none focus:border-primary-dark"
-                        />
+                        <div className="flex items-center w-full h-[52px] rounded-full bg-[#F5F5F5] overflow-hidden">
+                          <button
+                            onClick={() => updateQuestionType(qt.id, "count", Math.max(1, qt.count - 1))}
+                            className="flex-1 h-full flex items-center justify-center font-bricolage font-light text-[24px] leading-none text-primary-text active:opacity-60"
+                          >
+                            –
+                          </button>
+                          <span className="w-[36px] text-center font-bricolage font-semibold text-[16px] text-primary-text select-none">
+                            {qt.count}
+                          </span>
+                          <button
+                            onClick={() => updateQuestionType(qt.id, "count", Math.min(50, qt.count + 1))}
+                            className="flex-1 h-full flex items-center justify-center font-bricolage font-light text-[24px] leading-none text-primary-text active:opacity-60"
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-8">
-                        <span className="font-bricolage font-normal text-[14px] text-primary-text">
-                          ×
+
+                      {/* Marks column */}
+                      <div className="flex-1 flex flex-col gap-10 items-center">
+                        <span className="font-bricolage font-medium text-[14px] leading-[18px] tracking-[-0.52px] text-[#5D5D5D]">
+                          Marks
                         </span>
-                        <input
-                          type="number"
-                          min={1}
-                          max={20}
-                          value={qt.marks}
-                          onChange={(e) =>
-                            updateQuestionType(qt.id, "marks", parseInt(e.target.value) || 1)
-                          }
-                          className="w-[48px] h-[36px] rounded-[8px] border border-border-input px-8 text-center font-bricolage text-[14px] text-primary-text bg-white focus:outline-none focus:border-primary-dark"
-                        />
-                        <span className="font-bricolage font-normal text-[14px] text-primary-text">
-                          marks
-                        </span>
+                        <div className="flex items-center w-full h-[52px] rounded-full bg-[#F5F5F5] overflow-hidden">
+                          <button
+                            onClick={() => updateQuestionType(qt.id, "marks", Math.max(1, qt.marks - 1))}
+                            className="flex-1 h-full flex items-center justify-center font-bricolage font-light text-[24px] leading-none text-primary-text active:opacity-60"
+                          >
+                            –
+                          </button>
+                          <span className="w-[36px] text-center font-bricolage font-semibold text-[16px] text-primary-text select-none">
+                            {qt.marks}
+                          </span>
+                          <button
+                            onClick={() => updateQuestionType(qt.id, "marks", Math.min(20, qt.marks + 1))}
+                            className="flex-1 h-full flex items-center justify-center font-bricolage font-light text-[24px] leading-none text-primary-text active:opacity-60"
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
+
+
+              {/* Add Question Type */}
+              <button
+                onClick={addQuestionType}
+                className="flex items-center gap-8 font-bricolage font-bold text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text hover:opacity-70 transition-opacity mt-4"
+              >
+                <span className="flex items-center justify-center w-[28px] h-[28px] rounded-full bg-primary-dark text-white flex-shrink-0">
+                  <PlusIcon />
+                </span>
+                <span>Add Question Type</span>
+              </button>
+
+              {/* Totals row */}
+              <div className="flex flex-col items-end gap-2 mt-8">
+                <span className="font-bricolage font-normal text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text">
+                  Total Questions :{" "}
+                  <strong>{questionTypes.reduce((s, q) => s + q.count, 0)}</strong>
+                </span>
+                <span className="font-bricolage font-normal text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text">
+                  Total Marks :{" "}
+                  <strong>{questionTypes.reduce((s, q) => s + q.count * q.marks, 0)}</strong>
+                </span>
               </div>
             </div>
 

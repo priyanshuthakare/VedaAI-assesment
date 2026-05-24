@@ -93,13 +93,27 @@ function LibraryIcon() {
 
 function SettingsIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+    <svg
+      width="25"
+      height="25"
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+      className="shrink-0"
+    >
       <path
-        d="M10 2V4M10 16V18M18 10H16M4 10H2M15.66 4.34L14.24 5.76M5.76 14.24L4.34 15.66M15.66 15.66L14.24 14.24M5.76 5.76L4.34 4.34"
+        d="M10 2.5L11.2 4.3C11.4 4.6 11.8 4.8 12.2 4.7L14.3 4.2L15.2 6.1L14 7.7C13.8 8 13.8 8.4 14 8.7L15.2 10.3L14.3 12.2L12.2 11.7C11.8 11.6 11.4 11.8 11.2 12.1L10 13.9L8.8 12.1C8.6 11.8 8.2 11.6 7.8 11.7L5.7 12.2L4.8 10.3L6 8.7C6.2 8.4 6.2 8 6 7.7L4.8 6.1L5.7 4.2L7.8 4.7C8.2 4.8 8.6 4.6 8.8 4.3L10 2.5Z"
         stroke="currentColor"
         strokeWidth="1.5"
-        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+
+      <circle
+        cx="10"
+        cy="8.2"
+        r="2.2"
+        stroke="currentColor"
+        strokeWidth="1.5"
       />
     </svg>
   );
@@ -155,7 +169,7 @@ export function Sidebar() {
     <aside className="dashboard-sidebar">
       <div className="flex items-center gap-8">
         <div className="dashboard-sidebar__logo-mark">
-          <Image src="/logo2.png" alt="VedaAI logo" width={50} height={50} priority />
+          <Image src="/logo11.avif" alt="VedaAI logo" width={50} height={50} priority />
         </div>
         <span className="font-bricolage font-bold text-[28px] leading-[20px] tracking-[-1.68px] text-primary-text">
           VedaAI
@@ -213,18 +227,28 @@ export function Sidebar() {
           className="flex items-center gap-8 px-12 py-8 text-secondary-text hover:bg-surface-secondary rounded-[8px] transition-colors"
         >
           <SettingsIcon />
-          <span className="font-bricolage text-[16px] leading-[22px] tracking-[-0.64px]">
+          <span className="font-bricolage text-[16px] leading-none tracking-[-0.64px]">
             Settings
           </span>
         </Link>
 
-        <Image
-          className="dashboard-sidebar__school-card"
-          src="/avatar.png"
-          alt="Delhi Public School, Bokaro Steel City"
-          width={512}
-          height={168}
-        />
+        <section className="dashboard-sidebar__school-profile" aria-label="School profile">
+          <div className="dashboard-sidebar__school-row">
+            <div className="dashboard-sidebar__school-avatar-shell">
+              <Image
+                className="dashboard-sidebar__school-avatar"
+                src="/delhi-avatar.png"
+                alt="Delhi Public School"
+                width={44}
+                height={44}
+              />
+            </div>
+            <div className="dashboard-sidebar__school-copy">
+              <p className="dashboard-sidebar__school-name">Delhi Public School</p>
+              <p className="dashboard-sidebar__school-location">Bokaro Steel City</p>
+            </div>
+          </div>
+        </section>
       </div>
     </aside>
   );

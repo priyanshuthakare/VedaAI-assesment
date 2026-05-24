@@ -243,7 +243,6 @@ body {
   flex: 1;
   flex-direction: column;
   gap: var(--spacing-12);
-  min-height: calc(100vh - 24px);
   min-width: 0;
 }
 
@@ -297,10 +296,67 @@ body {
   background: var(--color-262626);
 }
 
-.dashboard-sidebar__school-card {
+.dashboard-sidebar__school-profile {
   width: 100%;
-  height: auto;
-  border-radius: var(--radius-16);
+  min-height: 98px;
+  padding: var(--spacing-12);
+  border-radius: 16px;
+  background: #e8e8e8;
+}
+
+.dashboard-sidebar__school-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 74px;
+}
+
+.dashboard-sidebar__school-avatar-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  flex: 0 0 60px;
+  border-radius: 999px;
+  background: #f5f5f5;
+}
+
+.dashboard-sidebar__school-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.dashboard-sidebar__school-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  min-height: 48px;
+  gap: 2px;
+}
+
+.dashboard-sidebar__school-name,
+.dashboard-sidebar__school-location {
+  margin: 0;
+  font-family: var(--font-bricolage), sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -0.64px;
+}
+
+.dashboard-sidebar__school-name {
+  color: var(--color-primary-text);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dashboard-sidebar__school-location {
+  color: #666666;
+  font-weight: 400;
 }
 
 .dashboard-topnav {
@@ -444,6 +500,52 @@ body {
   font-weight: 500;
   line-height: 22.4px;
   letter-spacing: -0.64px;
+}
+
+.create-assignment-dock {
+  position: fixed;
+  right: 12px;
+  bottom: 0;
+  left: 328px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 73px;
+  margin: 0 auto;
+  padding: 10px 0;
+  background: linear-gradient(180deg, rgba(239, 239, 239, 0) 0%, rgba(239, 239, 239, 0.78) 48%, rgba(239, 239, 239, 0.92) 100%);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  pointer-events: none;
+}
+
+.create-assignment-dock__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-4);
+  width: 208px;
+  min-height: 46px;
+  padding: var(--spacing-12) var(--spacing-24);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-48);
+  background: var(--color-primary-dark);
+  color: var(--color-surface);
+  font-family: var(--font-inter), sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: auto;
+  transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.create-assignment-dock__button:hover {
+  transform: translateY(-1px);
+  background: #242424;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
 }
 
 .output-screen {
@@ -592,11 +694,11 @@ body {
     min-height: 100vh;
   }
 
-  .dashboard-layout__content {
-    display: block;
-    padding-top: 137px;
-    padding-bottom: 132px;
-  }
+.dashboard-layout__content {
+  display: block;
+  padding-top: 84px;
+  padding-bottom: 132px;
+}
 
   .dashboard-layout__mobile-nav,
   .mobile-browser-bar,
@@ -616,19 +718,7 @@ body {
   }
 
   .mobile-browser-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 5;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 100%;
-    height: 81px;
-    padding: 18px 20px 18px;
-    background: var(--color-353739);
-    color: var(--color-surface);
-    font-family: Arial, sans-serif;
+    display: none;
   }
 
   .mobile-browser-bar__status,
@@ -650,19 +740,36 @@ body {
     right: 31px;
   }
 
-  .mobile-app-header {
-    position: fixed;
-    top: 81px;
-    left: 10px;
-    z-index: 6;
-    align-items: center;
-    justify-content: space-between;
-    width: 373px;
-    height: 56px;
-    padding: 0 var(--spacing-16) 0 var(--spacing-12);
-    border-radius: var(--radius-16);
-    background: var(--color-surface);
-  }
+.mobile-app-header {
+  position: fixed;
+  top: 16px;
+  left: 10px;
+  right: 10px;
+  z-index: 6;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: 56px;
+  padding: 0 var(--spacing-16) 0 var(--spacing-12);
+
+  border-radius: var(--radius-16);
+
+  
+  background: rgba(255, 255, 255, 0.72);
+
+  
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255, 255, 255, 0.65);
+
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
 
   .mobile-app-header__brand,
   .mobile-app-header__actions {
@@ -727,6 +834,10 @@ body {
     margin-top: var(--spacing-4);
   }
 
+  .create-assignment-dock {
+    display: none;
+  }
+
   .mobile-create-button {
     position: fixed;
     right: 10px;
@@ -776,17 +887,23 @@ body {
     color: var(--color-surface);
   }
 
-  .mobile-home-indicator {
-    position: fixed;
-    bottom: 8px;
-    left: calc(50% - 64px);
-    z-index: 5;
-    width: 128px;
-    height: 5px;
-    border-radius: var(--radius-100);
-    background: var(--color-2f2f2f7f);
-  }
-
+.mobile-home-indicator {
+  position: fixed;
+  /* Positions it 8px above the device's safe hardware zone */
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px)); 
+  
+  /* Bulletproof centering */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  
+  width: 128px;
+  height: 5px;
+  border-radius: var(--radius-100);
+  
+  /* Better practice: Use a semantic variable name, or fall back to standard rgba */
+  background: var(--color-home-indicator-bg, rgba(47, 47, 47, 0.5)); 
+}
   .output-screen {
     width: 373px;
     margin: 0 auto 24px;

@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import { DashboardLayout } from "@/components/layout";
 import { Spinner } from "@/components/ui";
-import { useOutputStore } from "@/store/outputStore";
 import { api } from "@/lib/api";
-import type { QuestionPaper } from "@/types";
+import { useOutputStore } from "@/store/outputStore";
+import type { Assignment, QuestionPaper } from "@/types";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function DownloadIcon({ stroke = "#2F2F2F" }: { stroke?: string }) {
   return (
@@ -22,31 +22,19 @@ function DownloadIcon({ stroke = "#2F2F2F" }: { stroke?: string }) {
   );
 }
 
+/**
+ * @intent Displays the generated question paper output for a given assignment ID.
+ * Fetches both the question paper result and the original assignment input to
+ * build a fully dynamic AI summary message and paper metadata.
+ */
 export default function OutputPage() {
   const params = useParams();
   const assignmentId = params.id as string;
-  const { questionPaper, setQuestionPaper, isLoading, setLoading, error, setError } =
+  const { questionPaper, setQuestionPaper, isLoading, setLoading, setError } =
     useOutputStore();
+  const [assignment, setAssignment] = useState<Assignment | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const fallbackPaper: QuestionPaper = {
-    title: "Delhi Public School, Sector-4, Bokaro",
-    subject: "English",
-    duration: "45 minutes",
-    totalMarks: 20,
-    sections: [
-      {
-        id: "a",
-        label: "Section A",
-        instruction: "Short Answer Questions Attempt all questions. Each question carries 2 marks",
-        questions: [
-          { id: "q1", number: 1, text: "Define electroplating. Explain its purpose.", difficulty: "easy", marks: 2, type: "short" },
-          { id: "q2", number: 2, text: "What is the role of a conductor in the process of electrolysis?", difficulty: "moderate", marks: 2, type: "short" },
-          { id: "q3", number: 3, text: "Why does a solution of copper sulfate conduct electricity?", difficulty: "easy", marks: 2, type: "short" },
-        ],
-      },
-    ],
-  };
 
   useEffect(() => {
     const updateViewport = () => setIsMobile(window.innerWidth <= 767);
@@ -56,19 +44,24 @@ export default function OutputPage() {
   }, []);
 
   useEffect(() => {
-    async function fetchResult() {
+    if (!assignmentId) return;
+
+    async function fetchData() {
       setLoading(true);
       try {
-        const res = await api.get(`/assignments/${assignmentId}/result`);
-        setQuestionPaper(res.data.questionPaper as QuestionPaper);
+        const [resultRes, assignmentRes] = await Promise.all([
+          api.get(`/assignments/${assignmentId}/result`),
+          api.get(`/assignments/${assignmentId}`),
+        ]);
+        setQuestionPaper(resultRes.data.questionPaper as QuestionPaper);
+        setAssignment(assignmentRes.data as Assignment);
       } catch (err: unknown) {
-        console.error("Failed to fetch result:", err);
+        console.error("Failed to fetch output:", err);
         setError("Failed to load question paper");
       }
     }
-    if (assignmentId) {
-      fetchResult();
-    }
+
+    fetchData();
   }, [assignmentId, setQuestionPaper, setLoading, setError]);
 
   const handleDownloadPdf = async () => {
@@ -102,15 +95,25 @@ export default function OutputPage() {
     );
   }
 
-  const paper = questionPaper || fallbackPaper;
+  if (!questionPaper) return null;
+
+  const paper = questionPaper;
+  const topic = assignment?.input?.topic || paper.subject;
+  const totalQuestions = paper.sections.reduce(
+    (sum, s) => sum + s.questions.length,
+    0
+  );
+
+  // Dynamic AI banner message
+  const aiMessage = `Here is your customized Question Paper on "${topic}" — ${totalQuestions} question${totalQuestions !== 1 ? "s" : ""}, ${paper.totalMarks} marks (${paper.duration}).`;
 
   return (
     <DashboardLayout breadcrumb="Create New" hideMobileNav>
       <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", maxWidth: isMobile ? "373px" : "1100px", margin: "0 auto" }}>
+        {/* AI summary banner */}
         <section style={{ display: "flex", flexDirection: "column", gap: "12px", padding: isMobile ? "24px 16px" : "24px 32px", borderRadius: "32px", background: "#2F2F2F", color: "#EFEFEF" }}>
           <p style={{ fontFamily: "var(--font-bricolage), sans-serif", fontSize: isMobile ? "14px" : "20px", fontWeight: 700, lineHeight: isMobile ? "16.8px" : "28px", letterSpacing: isMobile ? "-0.56px" : "-0.8px" }}>
-            Certainly, Lakshya! Here are customized Question Paper for your CBSE Grade 8 Science
-            classes on the NCERT chapters:
+            {aiMessage}
           </p>
           <button
             onClick={handleDownloadPdf}
@@ -122,38 +125,45 @@ export default function OutputPage() {
           </button>
         </section>
 
+        {/* Question paper */}
         <article style={{ padding: isMobile ? "24px 16px" : "48px 40px", borderRadius: "32px", background: isMobile ? "#F6F6F6" : "#FFFFFF", color: "#2F2F2F", fontFamily: "var(--font-inter), sans-serif" }}>
           <h1 style={{ textAlign: isMobile ? "left" : "center", fontSize: isMobile ? "16px" : "56px", fontWeight: 600, lineHeight: isMobile ? "20.8px" : 1.2, letterSpacing: isMobile ? "-0.32px" : "-0.96px" }}>
-            Delhi Public School, Sector-4, Bokaro
+            {paper.title}
           </h1>
-          <p style={{ textAlign: isMobile ? "left" : "center", fontSize: isMobile ? "16px" : "56px", fontWeight: 600, lineHeight: isMobile ? "20.8px" : 1.2, letterSpacing: isMobile ? "-0.32px" : "-0.96px" }}>Subject: {paper.subject || "English"}</p>
-          <p style={{ textAlign: isMobile ? "left" : "center", fontSize: isMobile ? "16px" : "56px", fontWeight: 600, lineHeight: isMobile ? "20.8px" : 1.2, letterSpacing: isMobile ? "-0.32px" : "-0.96px" }}>Class: 5th</p>
+          <p style={{ textAlign: isMobile ? "left" : "center", fontSize: isMobile ? "16px" : "56px", fontWeight: 600, lineHeight: isMobile ? "20.8px" : 1.2, letterSpacing: isMobile ? "-0.32px" : "-0.96px" }}>
+            Subject: {paper.subject}
+          </p>
 
           <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", gap: isMobile ? "10px" : 0, marginTop: isMobile ? "14px" : "36px", fontSize: isMobile ? "14px" : "18px", fontWeight: 600, lineHeight: isMobile ? "22.4px" : "28.8px", letterSpacing: isMobile ? "-0.56px" : "-0.72px" }}>
-            <p>Time Allowed: {paper.duration || "45 minutes"}</p>
-            <p>Maximum Marks: {paper.totalMarks || 20}</p>
+            <p>Time Allowed: {paper.duration}</p>
+            <p>Maximum Marks: {paper.totalMarks}</p>
           </div>
 
-          <p style={{ marginTop: isMobile ? "14px" : "28px", fontSize: isMobile ? "16px" : "18px", fontWeight: isMobile ? 400 : 600, lineHeight: isMobile ? "24px" : "28.8px", letterSpacing: isMobile ? "-0.64px" : "-0.72px" }}>
-            All questions are compulsory unless stated otherwise.
-          </p>
+          {assignment?.input?.instructions && (
+            <p style={{ marginTop: isMobile ? "14px" : "28px", fontSize: isMobile ? "16px" : "18px", fontWeight: isMobile ? 400 : 600, lineHeight: isMobile ? "24px" : "28.8px", letterSpacing: isMobile ? "-0.64px" : "-0.72px" }}>
+              {assignment.input.instructions}
+            </p>
+          )}
 
           <div style={{ marginTop: isMobile ? "14px" : "28px", fontSize: isMobile ? "16px" : "18px", fontWeight: isMobile ? 400 : 600, lineHeight: isMobile ? "24px" : "36px", letterSpacing: isMobile ? "-0.64px" : "-0.72px" }}>
             <p>Name: ____________________</p>
             <p>Roll Number: ________________</p>
-            <p>Class: 5th Section: _________</p>
           </div>
 
           {paper.sections.map((section, sectionIdx) => (
             <section key={section.id || sectionIdx} style={{ marginTop: "32px" }}>
-              <h2 style={{ textAlign: isMobile ? "left" : "center", fontSize: isMobile ? "16px" : "36px", fontWeight: 600, lineHeight: isMobile ? "25.6px" : "42px", letterSpacing: "-0.64px" }}>{section.label || `Section ${String.fromCharCode(65 + sectionIdx)}`}</h2>
-              {section.instruction && <p style={{ marginTop: "16px", fontSize: isMobile ? "16px" : "18px", lineHeight: isMobile ? "24px" : "28px", letterSpacing: "-0.64px" }}>{section.instruction}</p>}
-
+              <h2 style={{ textAlign: isMobile ? "left" : "center", fontSize: isMobile ? "16px" : "36px", fontWeight: 600, lineHeight: isMobile ? "25.6px" : "42px", letterSpacing: "-0.64px" }}>
+                {section.label || `Section ${String.fromCharCode(65 + sectionIdx)}`}
+              </h2>
+              {section.instruction && (
+                <p style={{ marginTop: "16px", fontSize: isMobile ? "16px" : "18px", lineHeight: isMobile ? "24px" : "28px", letterSpacing: "-0.64px" }}>
+                  {section.instruction}
+                </p>
+              )}
               <ol style={{ marginTop: "18px", paddingLeft: isMobile ? "22px" : "28px", fontSize: isMobile ? "16px" : "20px", lineHeight: isMobile ? "24px" : 1.7, letterSpacing: "-0.64px" }}>
                 {section.questions.map((question, questionIdx) => (
                   <li key={question.id || questionIdx} style={{ marginBottom: "8px" }}>
-                    [{question.difficulty === "hard" ? "Challenging" : question.difficulty === "easy" ? "Easy" : "Moderate"}]{" "}
-                    {question.text} [{question.marks} Marks]
+                    {question.text} [{question.marks} Mark{question.marks !== 1 ? "s" : ""}]
                   </li>
                 ))}
               </ol>
@@ -164,3 +174,5 @@ export default function OutputPage() {
     </DashboardLayout>
   );
 }
+
+

@@ -93,7 +93,7 @@ export function TopNavBar({ breadcrumb = "Assignment" }: TopNavBarProps) {
           </button>
           <div className="dashboard-profile">
             <Image src="/avatarmonkey.png" alt="" width={32} height={32} />
-            <span>John Doe</span>
+            <span>Priyanshu</span>
             <ChevronDownIcon />
           </div>
         </div>
@@ -103,7 +103,7 @@ export function TopNavBar({ breadcrumb = "Assignment" }: TopNavBarProps) {
       <header className="mobile-app-header">
         <div className="mobile-app-header__brand">
           <div className="mobile-app-header__logo">
-            <Image src="/logo2.png" alt="VedaAI logo" width={28} height={28} priority />
+            <Image src="/logo11.avif" alt="VedaAI logo" width={28} height={28} priority />
           </div>
           <span>VedaAI</span>
         </div>

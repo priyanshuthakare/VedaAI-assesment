@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { DashboardLayout } from "@/components/layout";
+import { CreateAssignmentDock, DashboardLayout } from "@/components/layout";
 import { api } from "@/lib/api";
 import type { Assignment } from "@/types";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 function SearchIcon() {
   return (
@@ -52,6 +52,20 @@ function ArrowRightIcon() {
   );
 }
 
+function ArrowLeftIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M19 12H5M5 12L12 19M5 12L12 5"
+        stroke="#2F2F2F"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function AssignmentsPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,9 +98,23 @@ export default function AssignmentsPage() {
 
   return (
     <DashboardLayout breadcrumb="Assignment">
-      <div className="flex flex-col w-full max-w-[1100px] mx-auto gap-12">
+      <div className="relative mx-auto flex w-full max-w-[1100px] flex-col gap-12 pb-[88px] max-md:w-[373px] max-md:gap-10 max-md:pb-0">
+        <div className="hidden max-md:flex max-md:h-[48px] max-md:w-[373px] max-md:items-center max-md:justify-between">
+          <Link
+            href="/"
+            className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[100px] bg-[rgba(255,255,255,0.25)] backdrop-blur-[12px]"
+          >
+            <ArrowLeftIcon />
+          </Link>
+          <div className="flex h-[48px] w-[373px] items-center justify-center">
+            <h2 className="font-bricolage text-[16px] font-bold leading-[22.4px] tracking-[-0.64px] text-primary-text">
+              Assignments
+            </h2>
+          </div>
+        </div>
+
         {/* Header */}
-        <div className="flex items-center gap-12 px-8">
+        <div className="flex items-center gap-12 px-8 max-md:hidden">
           <div className="relative">
             <div className="w-[12px] h-[12px] rounded-full bg-accent-green" />
             <div className="absolute inset-[-4px] rounded-full border-[4px] border-[#4BC16C66]" />
@@ -102,23 +130,25 @@ export default function AssignmentsPage() {
         </div>
 
         {/* Toolbar */}
-        <div className="flex items-center gap-36 bg-white rounded-[20px] px-16 h-[64px] max-md:flex-col max-md:h-auto max-md:py-12 max-md:gap-12">
+        <div className="flex h-[64px] items-center gap-36 rounded-[20px] bg-white px-16 max-md:w-[373px] max-md:justify-between max-md:gap-0 max-md:rounded-[16px] max-md:px-[16px]">
           {/* Filter */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-[4px]">
             <FilterIcon />
-            <span className="font-bricolage font-normal text-[14px] text-[#A9A9A9]">Filter By</span>
+            <span className="font-bricolage text-[14px] font-normal leading-[19.6px] tracking-[-0.56px] text-[#A9A9A9]">
+              Filter
+            </span>
           </div>
 
           {/* Search */}
-          <div className="flex-1 max-w-[380px] max-md:max-w-full max-md:w-full">
-            <div className="flex items-center gap-12 border border-[#00000033] rounded-[100px] px-16 py-11">
+          <div className="w-[340px] max-md:w-[228px] ml-auto">
+            <div className="flex h-[44px] w-full items-center gap-[12px] rounded-[100px] border border-[rgba(0,0,0,0.2)] px-[16px] py-[11px]">
               <SearchIcon />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search Assignment"
-                className="flex-1 bg-transparent font-bricolage text-[14px] text-primary-text placeholder:text-[#A9A9A9] outline-none"
+                placeholder="Search Name"
+                className="flex-1 bg-transparent font-bricolage text-[14px] font-normal leading-[19.6px] tracking-[-0.56px] text-primary-text placeholder:text-[#A9A9A9] outline-none"
               />
             </div>
           </div>
@@ -134,6 +164,8 @@ export default function AssignmentsPage() {
                 <PlaceholderCard key={card._id} title={card.title} assignedOn={card.assignedOn} dueOn={card.dueOn} />
               ))}
         </div>
+
+        <CreateAssignmentDock />
       </div>
     </DashboardLayout>
   );
@@ -173,62 +205,82 @@ function PlaceholderCard({
 function AssignmentCard({ assignment }: { assignment: Assignment }) {
   const formattedDate = (dateStr: string) => {
     if (!dateStr) return "—";
+
     const d = new Date(dateStr);
-    return `${d.getDate().toString().padStart(2, "0")}-${(d.getMonth() + 1).toString().padStart(2, "0")}-${d.getFullYear()}`;
+
+    return `${d
+      .getDate()
+      .toString()
+      .padStart(2, "0")}-${(d.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${d.getFullYear()}`;
   };
 
-  const statusColor =
-    assignment.status === "completed"
-      ? "bg-accent-green"
-      : assignment.status === "failed"
-      ? "bg-[#FF4040]"
-      : "bg-[#FFA009]";
-
   return (
-    <div className="bg-white rounded-[24px] p-24 flex flex-col gap-48 max-md:gap-24 max-md:p-16">
-      {/* Top Row */}
-      <div className="flex items-start justify-between">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-8">
-            <div className={`w-[8px] h-[8px] rounded-full ${statusColor}`} />
-            <h3 className="font-bricolage font-extrabold text-[24px] leading-[29px] tracking-[-0.96px] text-primary-text">
-              {assignment.input.topic}
-            </h3>
-          </div>
-          <div className="flex items-center gap-16 mt-4">
-            <span className="font-bricolage font-normal text-[16px] leading-[19px] tracking-[-0.64px] text-[#0000007F]">
-              Assigned on : {formattedDate(assignment.createdAt)}
-            </span>
-            {assignment.input.dueDate && (
-              <span className="font-bricolage font-normal text-[16px] leading-[19px] tracking-[-0.64px] text-[#0000007F]">
-                Due : {assignment.input.dueDate}
-              </span>
-            )}
-          </div>
-        </div>
-        <button className="p-4 hover:bg-surface-secondary rounded-[8px] transition-colors">
+    <Link
+      href={
+        assignment.status === "completed"
+          ? `/output/${assignment._id}`
+          : `/status/${assignment._id}`
+      }
+      className="
+        bg-white rounded-[24px]
+
+        h-[150px]
+
+        p-24
+
+        flex flex-col justify-between
+
+        max-md:h-[110px]
+        max-md:p-16
+
+        transition-all duration-200
+        hover:-translate-y-[2px]
+        hover:shadow-[0_12px_24px_rgba(0,0,0,0.06)]
+
+        active:scale-[0.99]
+
+        cursor-pointer
+      "
+    >
+      {/* Top Section */}
+      <div className="flex items-start justify-between gap-16">
+        <h3 className="font-bricolage font-extrabold text-[20px] leading-[29px] tracking-[-0.96px] text-primary-text">
+          {assignment.input.topic}
+        </h3>
+
+        <div className="p-4 rounded-[8px] shrink-0">
           <MoreIcon />
-        </button>
+        </div>
       </div>
 
-      {/* Bottom Row */}
-      <div className="flex items-center justify-between">
-        <Link
-          href={
-            assignment.status === "completed"
-              ? `/output/${assignment._id}`
-              : `/status/${assignment._id}`
-          }
-          className="flex items-center gap-4 font-bricolage font-medium text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text hover:opacity-70 transition-opacity"
-        >
-          <span>View Assignment</span>
-          <ArrowRightIcon />
-        </Link>
+      {/* Bottom Section */}
+      <div className="flex items-center justify-between gap-32">
+        {/* Assigned Date */}
+        <div className="flex items-center gap-4 whitespace-nowrap min-w-0">
+          <span className="font-bricolage font-semibold text-[16px] leading-[20px] tracking-[-0.64px] text-primary-text">
+            Assigned on :
+          </span>
 
-        <span className="font-bricolage font-medium text-[12px] text-secondary-text capitalize">
-          {assignment.status}
-        </span>
+          <span className="font-bricolage font-normal text-[16px] leading-[20px] tracking-[-0.64px] text-[#0000007F]">
+            {formattedDate(assignment.createdAt)}
+          </span>
+        </div>
+
+        {/* Due Date */}
+        {assignment.input.dueDate && (
+          <div className="flex items-center gap-4 whitespace-nowrap shrink-0">
+            <span className="font-bricolage font-semibold text-[16px] leading-[20px] tracking-[-0.64px] text-primary-text">
+              Due :
+            </span>
+
+            <span className="font-bricolage font-normal text-[16px] leading-[20px] tracking-[-0.64px] text-[#0000007F]">
+              {assignment.input.dueDate}
+            </span>
+          </div>
+        )}
       </div>
-    </div>
+    </Link>
   );
 }
