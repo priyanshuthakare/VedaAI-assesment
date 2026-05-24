@@ -4,7 +4,8 @@ import { CreateAssignmentDock, DashboardLayout } from "@/components/layout";
 import { api } from "@/lib/api";
 import type { Assignment } from "@/types";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
 
 function SearchIcon() {
   return (
@@ -85,6 +86,15 @@ export default function AssignmentsPage() {
     fetchAssignments();
   }, []);
 
+  const handleDelete = async (id: string) => {
+    try {
+      await api.delete(`/assignments/${id}`);
+      setAssignments((prev) => prev.filter((a) => a._id !== id));
+    } catch (err) {
+      console.error("Failed to delete assignment:", err);
+    }
+  };
+
   const filtered = assignments.filter((a) =>
     a.input.topic.toLowerCase().includes(search.toLowerCase())
   );
@@ -158,7 +168,7 @@ export default function AssignmentsPage() {
         <div className="grid grid-cols-2 gap-16 max-md:grid-cols-1">
           {!loading && filtered.length > 0
             ? filtered.map((assignment) => (
-                <AssignmentCard key={assignment._id} assignment={assignment} />
+                <AssignmentCard key={assignment._id} assignment={assignment} onDelete={handleDelete} />
               ))
             : placeholderCards.map((card) => (
                 <PlaceholderCard key={card._id} title={card.title} assignedOn={card.assignedOn} dueOn={card.dueOn} />
@@ -202,7 +212,25 @@ function PlaceholderCard({
   );
 }
 
-function AssignmentCard({ assignment }: { assignment: Assignment }) {
+function AssignmentCard({ assignment, onDelete }: { assignment: Assignment; onDelete: (id: string) => void }) {
+  const router = useRouter();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    if (showDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showDropdown]);
+
   const formattedDate = (dateStr: string) => {
     if (!dateStr) return "—";
 
@@ -216,13 +244,16 @@ function AssignmentCard({ assignment }: { assignment: Assignment }) {
       .padStart(2, "0")}-${d.getFullYear()}`;
   };
 
+  const handleCardClick = () => {
+    const targetUrl = assignment.status === "completed"
+      ? `/output/${assignment._id}`
+      : `/status/${assignment._id}`;
+    router.push(targetUrl);
+  };
+
   return (
-    <Link
-      href={
-        assignment.status === "completed"
-          ? `/output/${assignment._id}`
-          : `/status/${assignment._id}`
-      }
+    <div
+      onClick={handleCardClick}
       className="
         bg-white rounded-[24px]
 
@@ -250,8 +281,47 @@ function AssignmentCard({ assignment }: { assignment: Assignment }) {
           {assignment.input.topic}
         </h3>
 
-        <div className="p-4 rounded-[8px] shrink-0">
-          <MoreIcon />
+        <div className="relative" ref={dropdownRef}>
+          <div 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setShowDropdown(!showDropdown);
+            }}
+            className="p-4 rounded-[8px] shrink-0 hover:bg-black/5 transition-colors cursor-pointer"
+          >
+            <MoreIcon />
+          </div>
+
+          {showDropdown && (
+            <div 
+              className="absolute top-[120%] right-0 bg-white rounded-[16px] p-[8px] z-20 flex flex-col gap-2 min-w-[180px]"
+              style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.08), 0 0 1px rgba(0,0,0,0.1)" }}
+            >
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleCardClick();
+                  setShowDropdown(false);
+                }}
+                className="w-full text-left px-12 py-10 font-bricolage font-medium text-[14px] text-primary-text hover:bg-black/5 rounded-[10px] transition-colors"
+              >
+                View Assignment
+              </button>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete(assignment._id);
+                  setShowDropdown(false);
+                }}
+                className="w-full text-left px-12 py-10 font-bricolage font-medium text-[14px] text-[#DC2626] hover:bg-[#F0F0F0] rounded-[10px] transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -281,6 +351,6 @@ function AssignmentCard({ assignment }: { assignment: Assignment }) {
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 }

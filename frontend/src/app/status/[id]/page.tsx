@@ -6,19 +6,30 @@ import { DashboardLayout } from "@/components/layout";
 import { ProgressBar, Spinner } from "@/components/ui";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useGenerationStore } from "@/store/generationStore";
+import { api } from "@/lib/api";
 
 export default function StatusPage() {
   const params = useParams();
   const router = useRouter();
   const assignmentId = params.id as string;
 
-  const { status, progress, error, setAssignmentId } = useGenerationStore();
+  const { status, progress, error, setAssignmentId, setStatus, setError } = useGenerationStore();
 
   useEffect(() => {
     if (assignmentId) {
       setAssignmentId(assignmentId);
+      
+      // Fetch initial state to prevent race conditions (if WS events emit before connection)
+      api.get(`/assignments/${assignmentId}`).then(res => {
+        if (res.data) {
+          if (res.data.status && status === "idle") {
+             setStatus(res.data.status);
+          }
+          if (res.data.error) setError(res.data.error);
+        }
+      }).catch(err => console.error("Failed to fetch initial status", err));
     }
-  }, [assignmentId, setAssignmentId]);
+  }, [assignmentId, setAssignmentId, setStatus, setError, status]);
 
   useWebSocket(assignmentId);
 

@@ -138,3 +138,23 @@ export async function regenerateAssignment(req: Request, res: Response): Promise
     res.status(500).json({ error: "Failed to regenerate assignment" });
   }
 }
+
+export async function deleteAssignment(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id as string;
+    
+    const assignment = await Assignment.findByIdAndDelete(id);
+    if (!assignment) {
+      res.status(404).json({ error: "Assignment not found" });
+      return;
+    }
+
+    // Also delete associated results
+    await Result.deleteMany({ assignmentId: id });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("[deleteAssignment] Error:", error);
+    res.status(500).json({ error: "Failed to delete assignment" });
+  }
+}

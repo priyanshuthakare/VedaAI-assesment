@@ -360,6 +360,9 @@ body {
 }
 
 .dashboard-topnav {
+  position: sticky;
+  top: var(--spacing-12);
+  z-index: 50;
   display: flex;
   align-items: center;
   gap: var(--spacing-10);

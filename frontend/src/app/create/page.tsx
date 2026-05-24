@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 import { useAssignmentStore } from "@/store/assignmentStore";
 import { useGenerationStore } from "@/store/generationStore";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef } from "react";
 
 const questionTypeOptions = [
   { value: "mcq", label: "Multiple Choice Questions" },
@@ -39,6 +39,15 @@ function XIcon() {
   );
 }
 
+function MicIcon({ isListening }: { isListening?: boolean }) {
+  return (
+    <svg width="16" height="18" viewBox="0 0 14 18" fill="none">
+      <path d="M7 11.5C8.65685 11.5 10 10.1569 10 8.5V3.5C10 1.84315 8.65685 0.5 7 0.5C5.34315 0.5 4 1.84315 4 3.5V8.5C4 10.1569 5.34315 11.5 7 11.5Z" fill={isListening ? "#E23D3D" : "#2F2F2F"}/>
+      <path d="M13 8.5V9.5C13 12.8137 10.3137 15.5 7 15.5C3.68629 15.5 1 12.8137 1 9.5V8.5M7 15.5V17.5M4 17.5H10" stroke={isListening ? "#E23D3D" : "#2F2F2F"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
 export default function CreateAssignmentPage() {
   const router = useRouter();
   const { formData, updateField, setSubmitting, isSubmitting } = useAssignmentStore();
@@ -51,6 +60,44 @@ export default function CreateAssignmentPage() {
   const [instructions, setInstructions] = useState(formData.instructions || "");
   const [dueDate, setDueDate] = useState(formData.dueDate || "");
   const [topic, setTopic] = useState(formData.topic || "");
+
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const toggleListening = () => {
+    if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    
+    recognition.onstart = () => setIsListening(true);
+    
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setInstructions((prev) => (prev ? prev + " " + transcript : transcript));
+    };
+    
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error", event.error);
+      setIsListening(false);
+    };
+    
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+  };
 
   const addQuestionType = useCallback(() => {
     setQuestionTypes((prev) => [
@@ -372,18 +419,27 @@ export default function CreateAssignmentPage() {
               </div>
             </div>
 
-            {/* Additional Instructions */}
+            {/* Additional Information */}
             <div className="flex flex-col gap-8">
               <label className="font-bricolage font-bold text-[16px] leading-[22px] tracking-[-0.64px] text-primary-text">
-                Additional Instructions
+                Additional Information <span className="font-normal text-[#5D5D5D]">(For better output)</span>
               </label>
-              <textarea
-                value={instructions}
-                onChange={(e) => setInstructions(e.target.value)}
-                placeholder="e.g Generate a question paper for 3 hour exam duration..."
-                rows={4}
-                className="w-full rounded-[12px] border-[1.75px] border-border-input px-16 py-12 font-bricolage text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text placeholder:text-placeholder bg-white resize-none focus:outline-none focus:border-primary-dark transition-colors"
-              />
+              <div className="relative">
+                <textarea
+                  value={instructions}
+                  onChange={(e) => setInstructions(e.target.value)}
+                  placeholder="e.g Generate a question paper for 3 hour exam duration..."
+                  rows={4}
+                  className="w-full rounded-[16px] border border-dashed border-[#DCDCDC] bg-[#F5F5F5] px-16 py-12 pr-48 font-bricolage text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text placeholder:text-[#A9A9A9] resize-none focus:outline-none focus:border-primary-dark transition-colors"
+                />
+                <button
+                  onClick={toggleListening}
+                  className={`absolute right-12 bottom-12 w-[32px] h-[32px] rounded-full bg-white flex items-center justify-center transition-all ${isListening ? 'shadow-[0_0_0_4px_rgba(226,61,61,0.15)]' : 'shadow-sm hover:shadow'}`}
+                  title={isListening ? "Stop listening" : "Start Voice Typing"}
+                >
+                  <MicIcon isListening={isListening} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -93,28 +93,19 @@ function LibraryIcon() {
 
 function SettingsIcon() {
   return (
-    <svg
-      width="25"
-      height="25"
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
+    <svg 
+      width="20" 
+      height="20" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="1.75" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
       className="shrink-0"
     >
-      <path
-        d="M10 2.5L11.2 4.3C11.4 4.6 11.8 4.8 12.2 4.7L14.3 4.2L15.2 6.1L14 7.7C13.8 8 13.8 8.4 14 8.7L15.2 10.3L14.3 12.2L12.2 11.7C11.8 11.6 11.4 11.8 11.2 12.1L10 13.9L8.8 12.1C8.6 11.8 8.2 11.6 7.8 11.7L5.7 12.2L4.8 10.3L6 8.7C6.2 8.4 6.2 8 6 7.7L4.8 6.1L5.7 4.2L7.8 4.7C8.2 4.8 8.6 4.6 8.8 4.3L10 2.5Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-
-      <circle
-        cx="10"
-        cy="8.2"
-        r="2.2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
@@ -160,8 +151,8 @@ export function Sidebar() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
-    if (href === "/") return false;
-    if (href === "/assignments") return pathname === "/" || pathname.startsWith("/assignments");
+    if (href === "/") return pathname === "/";
+    if (href === "/assignments") return pathname.startsWith("/assignments") || pathname.startsWith("/status") || pathname.startsWith("/output") || pathname.startsWith("/create");
     return pathname === href;
   };
 

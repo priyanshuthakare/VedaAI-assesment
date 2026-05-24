@@ -22,8 +22,8 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "VedaAI — AI Assessment Creator",
-  description: "AI-powered question paper generator for teachers",
+  title: "VedaAI by Priyanshu (Developer)",
+  description: "AI-powered question paper generator for teachers by Priyanshu (Developer)",
 };
 
 export default function RootLayout({

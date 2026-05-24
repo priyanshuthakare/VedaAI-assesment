@@ -1,8 +1,10 @@
 import { Queue } from "bullmq";
-import { redis } from "../../config/redis";
+import { getRedisConnection } from "../../config/redis";
+
+const connection = getRedisConnection();
 
 export const assignmentQueue = new Queue("assignment-generation", {
-  connection: redis,
+  connection,
   defaultJobOptions: {
     attempts: 3,
     backoff: {

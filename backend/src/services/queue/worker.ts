@@ -1,5 +1,5 @@
 import { Worker, Job } from "bullmq";
-import { redis } from "../../config/redis";
+import { getRedisConnection } from "../../config/redis";
 import { generateQuestionPaper } from "../ai/generator";
 import { Assignment } from "../../models/Assignment";
 import { Result } from "../../models/Result";
@@ -78,7 +78,7 @@ export function startWorker(): Worker {
       }
     },
     {
-      connection: redis,
+      connection: getRedisConnection(),
       concurrency: 2,
     }
   );

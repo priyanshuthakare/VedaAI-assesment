@@ -3,8 +3,6 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useGenerationStore } from "@/store/generationStore";
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:4000";
-
 export function useWebSocket(assignmentId: string | null) {
   const wsRef = useRef<WebSocket | null>(null);
   const attemptRef = useRef(0);
@@ -12,6 +10,18 @@ export function useWebSocket(assignmentId: string | null) {
 
   const connect = useCallback(() => {
     if (!assignmentId) return;
+
+    let WS_URL = process.env.NEXT_PUBLIC_WS_URL;
+    if (!WS_URL) {
+      if (process.env.NEXT_PUBLIC_API_URL) {
+        WS_URL = process.env.NEXT_PUBLIC_API_URL.replace(/^http/, "ws").replace(/\/$/, "");
+      } else if (typeof window !== "undefined") {
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        WS_URL = `${protocol}//${window.location.hostname}:4000`;
+      } else {
+        WS_URL = "ws://localhost:4000";
+      }
+    }
 
     const ws = new WebSocket(`${WS_URL}/ws?assignmentId=${assignmentId}`);
     wsRef.current = ws;

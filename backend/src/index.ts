@@ -11,12 +11,22 @@ import { setupWebSocket } from "./websocket";
 import { startWorker } from "./services/queue/worker";
 import apiRoutes from "./routes";
 
+const isProduction = process.env.NODE_ENV === "production";
+const PORT = parseInt(process.env.PORT || "4000", 10);
+
 const app = express();
 const server = http.createServer(app);
 
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000" }));
+app.use(
+  cors({
+    origin: isProduction
+      ? process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim())
+      : "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "10mb" }));
 
 // Routes
@@ -30,11 +40,14 @@ app.get("/api/health", (_req, res) => {
 // WebSocket
 setupWebSocket(server);
 
-const PORT = parseInt(process.env.PORT || "4000", 10);
-
 async function start() {
   await connectMongoDB();
-  await redis.ping();
+
+  // In dev, ping ioredis to verify connection; Upstash REST doesn't need a ping
+  if (!isProduction) {
+    const ioRedis = redis as import("ioredis").default;
+    await ioRedis.ping();
+  }
 
   // Start BullMQ worker
   startWorker();

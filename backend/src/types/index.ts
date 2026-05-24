@@ -23,6 +23,7 @@ export interface Question {
   marks: number;
   type: "mcq" | "short" | "long" | "truefalse";
   options?: string[];
+  answer?: string;
 }
 
 export interface Section {
