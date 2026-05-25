@@ -103,6 +103,8 @@ export default function OutputPage() {
     (sum, s) => sum + s.questions.length,
     0
   );
+  const apiOrigin = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(/\/$/, "");
+  const previewUrl = `${apiOrigin}/api/assignments/${assignmentId}/pdf/preview`;
 
   // Dynamic AI banner message
   const aiMessage = `Here is your customized Question Paper on "${topic}" — ${totalQuestions} question${totalQuestions !== 1 ? "s" : ""}, ${paper.totalMarks} marks (${paper.duration}).`;
@@ -125,50 +127,24 @@ export default function OutputPage() {
           </button>
         </section>
 
-        {/* Question paper */}
-        <article style={{ padding: isMobile ? "24px 16px" : "48px 40px", borderRadius: "32px", background: isMobile ? "#F6F6F6" : "#FFFFFF", color: "#2F2F2F", fontFamily: "var(--font-inter), sans-serif" }}>
-          <h1 style={{ textAlign: isMobile ? "left" : "center", fontSize: isMobile ? "16px" : "56px", fontWeight: 600, lineHeight: isMobile ? "20.8px" : 1.2, letterSpacing: isMobile ? "-0.32px" : "-0.96px" }}>
-            {paper.title}
-          </h1>
-          <p style={{ textAlign: isMobile ? "left" : "center", fontSize: isMobile ? "16px" : "56px", fontWeight: 600, lineHeight: isMobile ? "20.8px" : 1.2, letterSpacing: isMobile ? "-0.32px" : "-0.96px" }}>
-            Subject: {paper.subject}
-          </p>
-
-          <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", gap: isMobile ? "10px" : 0, marginTop: isMobile ? "14px" : "36px", fontSize: isMobile ? "14px" : "18px", fontWeight: 600, lineHeight: isMobile ? "22.4px" : "28.8px", letterSpacing: isMobile ? "-0.56px" : "-0.72px" }}>
-            <p>Time Allowed: {paper.duration}</p>
-            <p>Maximum Marks: {paper.totalMarks}</p>
-          </div>
-
-          {assignment?.input?.instructions && (
-            <p style={{ marginTop: isMobile ? "14px" : "28px", fontSize: isMobile ? "16px" : "18px", fontWeight: isMobile ? 400 : 600, lineHeight: isMobile ? "24px" : "28.8px", letterSpacing: isMobile ? "-0.64px" : "-0.72px" }}>
-              {assignment.input.instructions}
-            </p>
-          )}
-
-          <div style={{ marginTop: isMobile ? "14px" : "28px", fontSize: isMobile ? "16px" : "18px", fontWeight: isMobile ? 400 : 600, lineHeight: isMobile ? "24px" : "36px", letterSpacing: isMobile ? "-0.64px" : "-0.72px" }}>
-            <p>Name: ____________________</p>
-            <p>Roll Number: ________________</p>
-          </div>
-
-          {paper.sections.map((section, sectionIdx) => (
-            <section key={section.id || sectionIdx} style={{ marginTop: "32px" }}>
-              <h2 style={{ textAlign: isMobile ? "left" : "center", fontSize: isMobile ? "16px" : "36px", fontWeight: 600, lineHeight: isMobile ? "25.6px" : "42px", letterSpacing: "-0.64px" }}>
-                {section.label || `Section ${String.fromCharCode(65 + sectionIdx)}`}
-              </h2>
-              {section.instruction && (
-                <p style={{ marginTop: "16px", fontSize: isMobile ? "16px" : "18px", lineHeight: isMobile ? "24px" : "28px", letterSpacing: "-0.64px" }}>
-                  {section.instruction}
-                </p>
-              )}
-              <ol style={{ marginTop: "18px", paddingLeft: isMobile ? "22px" : "28px", fontSize: isMobile ? "16px" : "20px", lineHeight: isMobile ? "24px" : 1.7, letterSpacing: "-0.64px" }}>
-                {section.questions.map((question, questionIdx) => (
-                  <li key={question.id || questionIdx} style={{ marginBottom: "8px" }}>
-                    {question.text} [{question.marks} Mark{question.marks !== 1 ? "s" : ""}]
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ))}
+        <article
+          style={{
+            borderRadius: "32px",
+            background: isMobile ? "#F6F6F6" : "#FFFFFF",
+            overflow: "hidden",
+            border: "1px solid #E8E8E8",
+          }}
+        >
+          <iframe
+            title="PDF Preview"
+            src={previewUrl}
+            style={{
+              width: "100%",
+              minHeight: isMobile ? "900px" : "1200px",
+              border: "0",
+              background: "#fff",
+            }}
+          />
         </article>
       </div>
     </DashboardLayout>

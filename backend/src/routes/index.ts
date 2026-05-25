@@ -7,7 +7,7 @@ import {
   listAssignments,
   regenerateAssignment,
 } from "../controllers/assignmentController";
-import { generatePdf } from "../controllers/pdfController";
+import { generatePdf, previewPdfHtml } from "../controllers/pdfController";
 
 const router = Router();
 
@@ -18,5 +18,6 @@ router.delete("/assignments/:id", deleteAssignment);
 router.get("/assignments/:id/result", getAssignmentResult);
 router.post("/assignments/:id/regenerate", regenerateAssignment);
 router.get("/assignments/:id/pdf", generatePdf);
+router.get("/assignments/:id/pdf/preview", previewPdfHtml);
 
 export default router;
