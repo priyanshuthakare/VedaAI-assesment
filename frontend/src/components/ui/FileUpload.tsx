@@ -64,7 +64,7 @@ export function FileUpload({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         className={cn(
-          "flex flex-col items-center justify-center gap-[8px] p-[48px]",
+          "flex flex-col items-center justify-center gap-[8px] p-[48px] max-md:p-[28px]",
           "border-[2px] border-dashed border-[#DCDCDC] rounded-[32px] bg-white/60 backdrop-blur-md shadow-sm",
           "cursor-pointer transition-all duration-200 hover:bg-white/80",
           isDragging && "border-[#171717] bg-[#F6F6F6]",
@@ -72,7 +72,7 @@ export function FileUpload({
         )}
       >
         {/* Upload cloud icon */}
-        <CloudUpload className="w-[32px] h-[32px] text-[#2F2F2F] mb-2" strokeWidth={1.5} />
+        <CloudUpload className="w-[32px] h-[32px] text-[#2F2F2F] mb-2 max-md:w-[28px] max-md:h-[28px]" strokeWidth={1.5} />
 
         {fileName ? (
           <p className="text-[14px] text-[#2F2F2F] font-[var(--font-bricolage-grotesque)]">
@@ -80,7 +80,7 @@ export function FileUpload({
           </p>
         ) : (
           <>
-            <p className="text-[16px] leading-[22.4px] tracking-[-0.64px] font-medium text-[#2F2F2F] font-[var(--font-bricolage-grotesque)]">
+            <p className="text-[16px] leading-[22.4px] tracking-[-0.64px] font-medium text-[#2F2F2F] font-[var(--font-bricolage-grotesque)] max-md:text-center">
               Choose a file or drag &amp; drop it here
             </p>
             <p className="text-[14px] text-[#A9A9A9] font-[var(--font-bricolage-grotesque)]">
@@ -89,7 +89,7 @@ export function FileUpload({
           </>
         )}
 
-        <label className="mt-[16px] px-[24px] py-[10px] bg-[#F5F5F5] rounded-full text-[14px] font-medium text-[#2F2F2F] cursor-pointer hover:bg-[#EBEBEB] transition-colors font-[var(--font-bricolage-grotesque)]">
+        <label className="mt-[16px] px-[24px] py-[10px] bg-[#F5F5F5] rounded-full text-[14px] font-medium text-[#2F2F2F] cursor-pointer hover:bg-[#EBEBEB] transition-colors font-[var(--font-bricolage-grotesque)] max-md:px-[28px] max-md:py-[12px]">
           Browse Files
           <input
             type="file"

@@ -308,7 +308,11 @@ function AssignmentCard({ assignment, onDelete }: { assignment: Assignment; onDe
     <div
       onClick={handleCardClick}
       className="
-        bg-white rounded-[24px]
+        rounded-[24px]
+        border border-white/45
+        bg-[linear-gradient(135deg,rgba(255,255,255,0.72),rgba(255,255,255,0.52))]
+        backdrop-blur-[14px]
+        supports-[backdrop-filter]:bg-[linear-gradient(135deg,rgba(255,255,255,0.62),rgba(255,255,255,0.45))]
 
         h-[150px]
 

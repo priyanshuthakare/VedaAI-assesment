@@ -5,6 +5,7 @@ import { Button, DatePicker, FileUpload, Input, Select } from "@/components/ui";
 import { api } from "@/lib/api";
 import { useAssignmentStore } from "@/store/assignmentStore";
 import { useGenerationStore } from "@/store/generationStore";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState, useRef } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -161,10 +162,10 @@ export default function CreateAssignmentPage() {
   };
 
   return (
-    <DashboardLayout breadcrumb="Assignment">
-      <div className="flex flex-col items-center w-full max-w-[1103px] mx-auto">
+    <DashboardLayout breadcrumb="Create Assignment">
+      <div className="flex flex-col items-center w-full max-w-[1103px] mx-auto max-md:px-[10px]">
         {/* Header */}
-        <div className="w-full p-8">
+        <div className="w-full p-8 max-md:hidden">
           <div className="flex items-center gap-12">
             {/* Green dot indicator */}
             <div className="relative">
@@ -182,15 +183,30 @@ export default function CreateAssignmentPage() {
           </div>
         </div>
 
+        <div className="hidden max-md:flex max-md:h-[48px] max-md:w-full max-md:items-center max-md:justify-between max-md:mb-8">
+          <Link
+            href="/"
+            className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[100px] bg-[#D9D9D9]"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="w-[24px] h-[24px] text-[#2F2F2F]" strokeWidth={2} />
+          </Link>
+          <div className="flex h-[48px] flex-1 items-center justify-center pr-[48px]">
+            <h2 className="font-bricolage text-[16px] font-bold leading-[22.4px] tracking-[-0.64px] text-primary-text">
+              Create Assignment
+            </h2>
+          </div>
+        </div>
+
         {/* Progress Bar */}
-        <div className="w-full flex gap-12 mt-0 px-[144px] max-md:px-16">
+        <div className="w-full flex gap-12 mt-0 px-[144px] max-md:px-[8px] max-md:mb-10">
           <div className={`flex-1 h-[5px] rounded-full ${step >= 1 ? "bg-[#5D5D5D]" : "bg-border"}`} />
           <div className={`flex-1 h-[5px] rounded-full ${step >= 2 ? "bg-[#5D5D5D]" : "bg-border"}`} />
         </div>
 
         {/* Form Card */}
         <div
-          className="w-full max-w-[810px] mt-32 rounded-[32px] p-32 max-md:p-16 max-md:mt-16 max-md:rounded-[24px]"
+          className="w-full max-w-[810px] mt-32 rounded-[32px] p-32 max-md:p-24 max-md:mt-0 max-md:rounded-[32px] max-md:w-[373px] max-md:border max-md:border-[#E2E2E2]"
           style={{ backgroundColor: "rgba(255, 255, 255, 0.5)" }}
         >
           {/* Section Title */}
@@ -204,7 +220,7 @@ export default function CreateAssignmentPage() {
           </div>
 
           {/* Form Fields */}
-          <div className="flex flex-col gap-16">
+            <div className="flex flex-col gap-16 max-md:gap-20">
             {step === 1 ? (
               <>
                 {/* File Upload */}
@@ -214,7 +230,7 @@ export default function CreateAssignmentPage() {
                 accept="image/jpeg,image/png,application/pdf"
                 maxSizeMB={10}
               />
-              <p className="font-bricolage font-normal text-[14px] leading-[22px] tracking-[-0.56px] text-placeholder">
+              <p className="font-bricolage font-normal text-[14px] leading-[22px] tracking-[-0.56px] text-placeholder max-md:text-center">
                 Upload images of your preferred document/image
               </p>
             </div>
@@ -313,11 +329,11 @@ export default function CreateAssignmentPage() {
               </div>
 
               {/* ── Mobile cards ── */}
-              <div className="flex md:hidden flex-col gap-8">
+              <div className="flex md:hidden flex-col gap-16">
                 {questionTypes.map((qt) => (
                   <div
                     key={qt.id}
-                    className="flex flex-col gap-10 rounded-[32px] bg-white p-20"
+                    className="flex flex-col gap-12 rounded-[24px] bg-white p-16 border border-[#ECECEC]"
                     style={{ boxShadow: "0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05)" }}
                   >
                     {/* Card header: select + X */}
@@ -327,7 +343,7 @@ export default function CreateAssignmentPage() {
                           value={qt.type}
                           onChange={(e) => updateQuestionType(qt.id, "type", e.target.value)}
                           options={questionTypeOptions}
-                          className="border-0 bg-transparent focus:border-0 px-0 text-[15px] font-semibold"
+                          className="border-0 bg-transparent focus:border-0 px-0 py-0 pr-[28px] text-[16px] font-semibold rounded-none"
                         />
                       </div>
                       <button
@@ -339,7 +355,7 @@ export default function CreateAssignmentPage() {
                     </div>
 
                     {/* Card body: gray inset with labels + steppers */}
-                    <div className="flex gap-10 rounded-[20px] bg-[#EBEBEB] p-16">
+                    <div className="flex gap-12 rounded-[20px] bg-[#EBEBEB] p-12">
                       {/* No. of Questions column */}
                       <div className="flex-1 flex flex-col gap-10 items-center">
                         <span className="font-bricolage font-medium text-[14px] leading-[18px] tracking-[-0.52px] text-[#5D5D5D]">
@@ -396,16 +412,16 @@ export default function CreateAssignmentPage() {
               {/* Add Question Type */}
               <button
                 onClick={addQuestionType}
-                className="flex items-center gap-8 font-bricolage font-bold text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text hover:opacity-70 transition-opacity mt-4"
+                className="flex items-center gap-10 font-bricolage font-bold text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text hover:opacity-70 transition-opacity mt-4"
               >
-                <span className="flex items-center justify-center w-[28px] h-[28px] rounded-full bg-primary-dark text-white flex-shrink-0">
+                <span className="flex items-center justify-center w-[28px] h-[28px] rounded-full bg-primary-dark text-white flex-shrink-0 max-md:w-[40px] max-md:h-[40px]">
                   <PlusIcon />
                 </span>
                 <span>Add Question Type</span>
               </button>
 
               {/* Totals row */}
-              <div className="flex flex-col items-end gap-2 mt-8">
+              <div className="flex flex-col items-end gap-2 mt-8 max-md:mt-4">
                 <span className="font-bricolage font-normal text-[14px] leading-[20px] tracking-[-0.56px] text-primary-text">
                   Total Questions :{" "}
                   <strong>{questionTypes.reduce((s, q) => s + q.count, 0)}</strong>
@@ -495,23 +511,23 @@ export default function CreateAssignmentPage() {
         </div>
 
         {/* Bottom Action */}
-        <div className="w-full max-w-[810px] mt-32 flex justify-between pb-32">
+        <div className="w-full max-w-[810px] mt-32 flex justify-between pb-32 max-md:w-[373px] max-md:mt-16 max-md:pb-0 max-md:mb-2">
           {step === 2 ? (
             <button
               onClick={() => setStep(1)}
-              className="flex items-center gap-[8px] px-[24px] py-[12px] bg-white rounded-full font-bricolage font-medium text-[16px] text-[#2F2F2F] hover:bg-[#F5F5F5] transition-colors shadow-sm"
+              className="flex items-center gap-[8px] px-[24px] py-[12px] bg-white rounded-full font-bricolage font-medium text-[16px] text-[#2F2F2F] hover:bg-[#F5F5F5] transition-colors shadow-sm max-md:w-[142px] max-md:h-[56px] max-md:justify-center"
             >
               <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={2} />
               Previous
             </button>
           ) : (
-            <div></div>
+            <div className="max-md:w-[142px]" />
           )}
           
           {step === 1 ? (
             <button
               onClick={() => setStep(2)}
-              className="flex items-center gap-[8px] px-[24px] py-[12px] bg-[#171717] rounded-full font-bricolage font-medium text-[16px] text-white hover:bg-black transition-colors"
+              className="flex items-center gap-[8px] px-[24px] py-[12px] bg-[#171717] rounded-full font-bricolage font-medium text-[16px] text-white hover:bg-black transition-colors max-md:w-[156px] max-md:h-[56px] max-md:justify-center"
             >
               Next
               <ArrowRight className="w-[20px] h-[20px]" strokeWidth={2} />

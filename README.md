@@ -1,6 +1,6 @@
 # VedaAI — AI Assessment Creator
 
-> **Full Stack Engineering Assignment** | Role: Full Stack Engineer
+> **Full Stack Devloper Assignment**
 
 A production-ready AI-powered assessment generation platform that allows educators to dynamically create structured question papers using Google Gemini AI. The system processes generation in the background via a job queue and delivers real-time status updates to the client over WebSockets.
 

@@ -69,9 +69,11 @@ export function MobileBottomNav() {
   return (
     <>
       <div className="mobile-nav-blur" aria-hidden="true" />
-      <Link href="/create" className="mobile-create-button" aria-label="Create assignment">
-        <CreateIcon />
-      </Link>
+      {pathname !== "/create" && (
+        <Link href="/create" className="mobile-create-button" aria-label="Create assignment">
+          <CreateIcon />
+        </Link>
+      )}
       <nav className="mobile-dock">
         {navItems.map((item) => {
           const active = isActive(item.href);

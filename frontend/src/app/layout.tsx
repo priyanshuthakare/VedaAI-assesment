@@ -36,7 +36,9 @@ export default function RootLayout({
       lang="en"
       className={`${bricolageGrotesque.variable} ${inter.variable} ${manrope.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body suppressHydrationWarning className="min-h-full flex flex-col">
+        {children}
+      </body>
     </html>
   );
 }
