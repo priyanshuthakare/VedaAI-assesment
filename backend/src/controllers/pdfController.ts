@@ -384,26 +384,3 @@ export async function generatePdf(req: Request, res: Response): Promise<void> {
     if (browser) await browser.close();
   }
 }
-
-export async function previewPdfHtml(req: Request, res: Response): Promise<void> {
-  try {
-    const id = req.params.id as string;
-    const [result, assignment] = await Promise.all([
-      Result.findOne({ assignmentId: id }),
-      Assignment.findById(id),
-    ]);
-
-    if (!result || !assignment) {
-      res.status(404).send("Result not found");
-      return;
-    }
-
-    const html = buildPdfHtml(result.questionPaper, assignment);
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
-    res.send(html);
-  } catch (err) {
-    console.error("[previewPdfHtml] Error:", err);
-    res.status(500).send("Failed to load preview");
-  }
-}
