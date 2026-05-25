@@ -236,6 +236,10 @@ body {
 
 .dashboard-layout__sidebar {
   flex: 0 0 304px;
+  position: sticky;
+  top: var(--spacing-12);
+  align-self: start;
+  height: calc(100vh - 24px);
 }
 
 .dashboard-layout__main {
@@ -263,7 +267,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 304px;
-  height: calc(100vh - 24px);
+  height: 100%;
   padding: var(--spacing-24);
   border-radius: var(--radius-16);
   background: var(--color-surface);
@@ -414,7 +418,7 @@ body {
   background: var(--color-surface-secondary);
 }
 
-.dashboard-notification > span {
+.dashboard-notification>span {
   position: absolute;
   top: 1px;
   right: 1px;
@@ -697,11 +701,11 @@ body {
     min-height: 100vh;
   }
 
-.dashboard-layout__content {
-  display: block;
-  padding-top: 84px;
-  padding-bottom: 132px;
-}
+  .dashboard-layout__content {
+    display: block;
+    padding-top: 84px;
+    padding-bottom: 132px;
+  }
 
   .dashboard-layout__mobile-nav,
   .mobile-browser-bar,
@@ -716,7 +720,7 @@ body {
     pointer-events: none;
   }
 
-  .dashboard-layout__mobile-nav > * {
+  .dashboard-layout__mobile-nav>* {
     pointer-events: auto;
   }
 
@@ -743,35 +747,35 @@ body {
     right: 31px;
   }
 
-.mobile-app-header {
-  position: fixed;
-  top: 16px;
-  left: 10px;
-  right: 10px;
-  z-index: 6;
+  .mobile-app-header {
+    position: fixed;
+    top: 16px;
+    left: 10px;
+    right: 10px;
+    z-index: 6;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-  height: 56px;
-  padding: 0 var(--spacing-16) 0 var(--spacing-12);
+    height: 56px;
+    padding: 0 var(--spacing-16) 0 var(--spacing-12);
 
-  border-radius: var(--radius-16);
+    border-radius: var(--radius-16);
 
-  
-  background: rgba(255, 255, 255, 0.72);
 
-  
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+    background: rgba(255, 255, 255, 0.72);
 
-  border: 1px solid rgba(255, 255, 255, 0.65);
 
-  box-shadow:
-    0 12px 24px rgba(0, 0, 0, 0.06),
-    0 4px 12px rgba(0, 0, 0, 0.03);
-}
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border: 1px solid rgba(255, 255, 255, 0.65);
+
+    box-shadow:
+      0 12px 24px rgba(0, 0, 0, 0.06),
+      0 4px 12px rgba(0, 0, 0, 0.03);
+  }
 
 
   .mobile-app-header__brand,
@@ -890,23 +894,24 @@ body {
     color: var(--color-surface);
   }
 
-.mobile-home-indicator {
-  position: fixed;
-  /* Positions it 8px above the device's safe hardware zone */
-  bottom: calc(8px + env(safe-area-inset-bottom, 0px)); 
-  
-  /* Bulletproof centering */
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  
-  width: 128px;
-  height: 5px;
-  border-radius: var(--radius-100);
-  
-  /* Better practice: Use a semantic variable name, or fall back to standard rgba */
-  background: var(--color-home-indicator-bg, rgba(47, 47, 47, 0.5)); 
-}
+  .mobile-home-indicator {
+    position: fixed;
+    /* Positions it 8px above the device's safe hardware zone */
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+
+    /* Bulletproof centering */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+
+    width: 128px;
+    height: 5px;
+    border-radius: var(--radius-100);
+
+    /* Better practice: Use a semantic variable name, or fall back to standard rgba */
+    background: var(--color-home-indicator-bg, rgba(47, 47, 47, 0.5));
+  }
+
   .output-screen {
     width: 373px;
     margin: 0 auto 24px;
