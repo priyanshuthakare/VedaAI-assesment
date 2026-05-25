@@ -1,7 +1,7 @@
 "use client";
 
-import { forwardRef, SelectHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { forwardRef, SelectHTMLAttributes } from "react";
 
 export interface SelectOption {
   label: string;
@@ -34,7 +34,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             id={selectId}
             className={cn(
-              "w-full border-[1.75px] border-[#00000033] rounded-[12px] px-[16px] py-[12px] pr-[40px]",
+              "w-full border-[1.75px] border-[#00000033] rounded-[24px] px-[16px] py-[12px] pr-[40px]",
               "text-[14px] leading-[19.6px] tracking-[-0.56px] font-normal text-[#2F2F2F] font-[var(--font-bricolage-grotesque)]",
               "focus:outline-none focus:border-[#171717] focus:ring-0",
               "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F6F6F6]",

@@ -13,6 +13,9 @@ export interface AssignmentInput {
   dueDate: string;
   instructions?: string;
   fileContent?: string;
+  className?: string;
+  subject?: string;
+  timeAllowed?: string;
 }
 
 export interface Question {

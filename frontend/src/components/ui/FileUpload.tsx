@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { cn } from "@/lib/utils";
+import { CloudUpload } from "lucide-react";
 
 export interface FileUploadProps {
   onFileSelect: (file: File) => void;
@@ -63,29 +64,15 @@ export function FileUpload({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         className={cn(
-          "flex flex-col items-center justify-center gap-[8px] p-[32px]",
-          "border-[1.75px] border-dashed border-[#00000033] rounded-[12px]",
-          "cursor-pointer transition-colors duration-200",
+          "flex flex-col items-center justify-center gap-[8px] p-[48px]",
+          "border-[2px] border-dashed border-[#DCDCDC] rounded-[32px] bg-white/60 backdrop-blur-md shadow-sm",
+          "cursor-pointer transition-all duration-200 hover:bg-white/80",
           isDragging && "border-[#171717] bg-[#F6F6F6]",
           error && "border-[#FF4040]"
         )}
       >
         {/* Upload cloud icon */}
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-          <path
-            d="M20 26V14M20 14L15 19M20 14L25 19"
-            stroke="#A9A9A9"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M33.333 28.333C33.333 31.095 31.095 33.333 28.333 33.333H11.667C8.905 33.333 6.667 31.095 6.667 28.333V28.333"
-            stroke="#A9A9A9"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
+        <CloudUpload className="w-[32px] h-[32px] text-[#2F2F2F] mb-2" strokeWidth={1.5} />
 
         {fileName ? (
           <p className="text-[14px] text-[#2F2F2F] font-[var(--font-bricolage-grotesque)]">
@@ -102,7 +89,7 @@ export function FileUpload({
           </>
         )}
 
-        <label className="mt-[8px] px-[16px] py-[8px] border-[1.75px] border-[#00000033] rounded-[100px] text-[14px] font-medium text-[#2F2F2F] cursor-pointer hover:bg-[#F6F6F6] transition-colors font-[var(--font-bricolage-grotesque)]">
+        <label className="mt-[16px] px-[24px] py-[10px] bg-[#F5F5F5] rounded-full text-[14px] font-medium text-[#2F2F2F] cursor-pointer hover:bg-[#EBEBEB] transition-colors font-[var(--font-bricolage-grotesque)]">
           Browse Files
           <input
             type="file"

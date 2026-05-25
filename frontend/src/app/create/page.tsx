@@ -7,6 +7,7 @@ import { useAssignmentStore } from "@/store/assignmentStore";
 import { useGenerationStore } from "@/store/generationStore";
 import { useRouter } from "next/navigation";
 import { useCallback, useState, useRef } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const questionTypeOptions = [
   { value: "mcq", label: "Multiple Choice Questions" },
@@ -60,6 +61,10 @@ export default function CreateAssignmentPage() {
   const [instructions, setInstructions] = useState(formData.instructions || "");
   const [dueDate, setDueDate] = useState(formData.dueDate || "");
   const [topic, setTopic] = useState(formData.topic || "");
+  const [step, setStep] = useState(1);
+  const [className, setClassName] = useState("");
+  const [subject, setSubject] = useState("");
+  const [timeAllowed, setTimeAllowed] = useState("");
 
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -137,6 +142,9 @@ export default function CreateAssignmentPage() {
       difficulty: formData.difficulty || { easy: 40, medium: 40, hard: 20 },
       dueDate: dueDate || undefined,
       instructions: instructions || undefined,
+      className: className || undefined,
+      subject: subject || undefined,
+      timeAllowed: timeAllowed || undefined,
     };
 
     try {
@@ -176,8 +184,8 @@ export default function CreateAssignmentPage() {
 
         {/* Progress Bar */}
         <div className="w-full flex gap-12 mt-0 px-[144px] max-md:px-16">
-          <div className="flex-1 h-[5px] rounded-full bg-[#5D5D5D]" />
-          <div className="flex-1 h-[5px] rounded-full bg-border" />
+          <div className={`flex-1 h-[5px] rounded-full ${step >= 1 ? "bg-[#5D5D5D]" : "bg-border"}`} />
+          <div className={`flex-1 h-[5px] rounded-full ${step >= 2 ? "bg-[#5D5D5D]" : "bg-border"}`} />
         </div>
 
         {/* Form Card */}
@@ -188,28 +196,18 @@ export default function CreateAssignmentPage() {
           {/* Section Title */}
           <div className="flex flex-col gap-2 mb-32">
             <h2 className="font-bricolage font-bold text-[20px] leading-[28px] tracking-[-0.8px] text-primary-text">
-              Assignment Details
+              {step === 1 ? "Assignment Details" : "Paper Details"}
             </h2>
             <p className="font-bricolage font-normal text-[14px] leading-[20px] tracking-[-0.56px] text-secondary-text">
-              Basic information about your assignment
+              {step === 1 ? "Basic information about your assignment" : "Enter details for the question paper header"}
             </p>
           </div>
 
           {/* Form Fields */}
           <div className="flex flex-col gap-16">
-            {/* Topic */}
-            <div className="flex flex-col gap-8">
-              <label className="font-bricolage font-bold text-[16px] leading-[22px] tracking-[-0.64px] text-primary-text">
-                Topic
-              </label>
-              <Input
-                placeholder="e.g. Photosynthesis, World War II, Quadratic Equations"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-              />
-            </div>
-
-            {/* File Upload */}
+            {step === 1 ? (
+              <>
+                {/* File Upload */}
             <div className="flex flex-col gap-12">
               <FileUpload
                 onFileSelect={(f) => setFile(f)}
@@ -441,18 +439,92 @@ export default function CreateAssignmentPage() {
                 </button>
               </div>
             </div>
+              </>
+            ) : (
+              <>
+                {/* Topic */}
+                <div className="flex flex-col gap-8">
+                  <label className="font-bricolage font-bold text-[16px] leading-[22px] tracking-[-0.64px] text-primary-text">
+                    Topic Name
+                  </label>
+                  <Input
+                    placeholder="e.g. Photosynthesis, World War II, Quadratic Equations"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                  />
+                </div>
+
+                {/* Class */}
+                <div className="flex flex-col gap-8">
+                  <label className="font-bricolage font-bold text-[16px] leading-[22px] tracking-[-0.64px] text-primary-text">
+                    Class
+                  </label>
+                  <Input
+                    placeholder="e.g. Class 10, Grade 8"
+                    value={className}
+                    onChange={(e) => setClassName(e.target.value)}
+                  />
+                </div>
+
+                {/* Subject */}
+                <div className="flex flex-col gap-8">
+                  <label className="font-bricolage font-bold text-[16px] leading-[22px] tracking-[-0.64px] text-primary-text">
+                    Subject
+                  </label>
+                  <Input
+                    placeholder="e.g. Science, History, Mathematics"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                  />
+                </div>
+
+                {/* Time Allowed */}
+                <div className="flex flex-col gap-8">
+                  <label className="font-bricolage font-bold text-[16px] leading-[22px] tracking-[-0.64px] text-primary-text">
+                    Time Allowed
+                  </label>
+                  <Input
+                    placeholder="e.g. 2 Hours, 45 Minutes"
+                    value={timeAllowed}
+                    onChange={(e) => setTimeAllowed(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
 
         {/* Bottom Action */}
-        <div className="w-full max-w-[810px] mt-32 flex justify-end pb-32">
-          <Button
-            onClick={handleSubmit}
-            isLoading={isSubmitting}
-            className="min-w-[200px]"
-          >
-            Generate Question Paper
-          </Button>
+        <div className="w-full max-w-[810px] mt-32 flex justify-between pb-32">
+          {step === 2 ? (
+            <button
+              onClick={() => setStep(1)}
+              className="flex items-center gap-[8px] px-[24px] py-[12px] bg-white rounded-full font-bricolage font-medium text-[16px] text-[#2F2F2F] hover:bg-[#F5F5F5] transition-colors shadow-sm"
+            >
+              <ArrowLeft className="w-[20px] h-[20px]" strokeWidth={2} />
+              Previous
+            </button>
+          ) : (
+            <div></div>
+          )}
+          
+          {step === 1 ? (
+            <button
+              onClick={() => setStep(2)}
+              className="flex items-center gap-[8px] px-[24px] py-[12px] bg-[#171717] rounded-full font-bricolage font-medium text-[16px] text-white hover:bg-black transition-colors"
+            >
+              Next
+              <ArrowRight className="w-[20px] h-[20px]" strokeWidth={2} />
+            </button>
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              isLoading={isSubmitting}
+              className="min-w-[200px]"
+            >
+              Generate Question Paper
+            </Button>
+          )}
         </div>
       </div>
     </DashboardLayout>

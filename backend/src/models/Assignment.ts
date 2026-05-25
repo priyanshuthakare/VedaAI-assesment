@@ -31,6 +31,9 @@ const AssignmentSchema = new Schema<IAssignment>(
       dueDate: { type: String },
       instructions: { type: String },
       fileContent: { type: String },
+      className: { type: String },
+      subject: { type: String },
+      timeAllowed: { type: String },
     },
     status: {
       type: String,

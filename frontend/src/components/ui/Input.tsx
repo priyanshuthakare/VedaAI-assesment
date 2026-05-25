@@ -1,7 +1,7 @@
 "use client";
 
-import { forwardRef, InputHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { forwardRef, InputHTMLAttributes } from "react";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -27,7 +27,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "w-full border-[1.75px] border-[#00000033] rounded-[12px] px-[16px] py-[12px]",
+            "w-full border-[1.75px] border-[#00000033] rounded-[16px] px-[16px] py-[12px]",
             "text-[14px] leading-[19.6px] tracking-[-0.56px] font-normal text-[#2F2F2F] font-[var(--font-bricolage-grotesque)]",
             "placeholder:text-[#2F2F2F99]",
             "focus:outline-none focus:border-[#171717] focus:ring-0",

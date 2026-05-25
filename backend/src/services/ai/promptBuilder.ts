@@ -17,6 +17,9 @@ Create a question paper with:
 - Marks per question: ${input.marksPerQuestion}
 - Types: ${typeList}
 - Difficulty: Easy=${input.difficulty.easy}%, Medium=${input.difficulty.medium}%, Hard=${input.difficulty.hard}%
+${input.className ? `- Class/Grade: ${input.className}` : ""}
+${input.subject ? `- Subject: ${input.subject}` : ""}
+${input.timeAllowed ? `- Time Allowed: ${input.timeAllowed}` : ""}
 ${input.instructions ? `- Extra instructions: ${input.instructions}` : ""}
 ${input.fileContent ? `- Reference material: ${input.fileContent.slice(0, 1000)}` : ""}
 
