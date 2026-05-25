@@ -24,6 +24,30 @@ A production-ready AI-powered assessment generation platform that allows educato
 
 ---
 
+## Approach
+
+The system is designed with a **decoupled, asynchronous architecture** to ensure reliability and a seamless user experience during long-running AI operations.
+- **Non-blocking API:** Heavy AI computations are offloaded to a background worker (BullMQ + Redis), ensuring the HTTP API remains fast and responsive.
+- **Real-time Feedback:** Instead of long-polling, a native WebSocket connection pushes granular progress updates (`10%`, `30%`, `100%`) directly to the client.
+- **Data Integrity:** Assignment inputs and AI-generated results are stored in separate MongoDB collections, allowing for safe regeneration without data loss.
+- **Deterministic Output:** We strictly prompt Google Gemini to return a specific JSON schema, which is parsed and mapped directly to our internal React components, avoiding brittle raw-text parsing.
+- **Server-Side PDF Rendering:** To guarantee layout consistency, PDFs are generated on the server using headless Chrome (Puppeteer) rather than relying on inconsistent browser-side `window.print()`.
+
+---
+
+## Architecture Overview
+
+> See [docs/architecture.md](docs/architecture.md) for full system diagrams and request flows.
+
+The platform is split into two independently deployed services:
+
+1. **Frontend (Next.js App Router):** Manages the user interface, routing, and global state (Zustand). It communicates with the backend via REST for CRUD operations and establishes a WebSocket connection for real-time job status.
+2. **Backend (Express + Node.js):** Handles API requests, WebSocket room management, and PDF generation.
+3. **Background Worker (BullMQ):** A dedicated worker process that pulls jobs from Upstash Redis, communicates with the Google Gemini API, and emits progress events back to the WebSocket server.
+4. **Database (MongoDB):** Provides persistent storage for assignment configurations and the final generated question papers.
+
+---
+
 ## Tech Stack
 
 ### Frontend — `vedaai/frontend/`
